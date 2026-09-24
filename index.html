@@ -711,10 +711,26 @@ const RANGES = {
         target: 50
     },
 
+    /*
+        Урон крита:
+
+        База = 35%
+
+        Проками необходимо получить
+        от +65% до +85%.
+
+        Итог:
+        35 + 65 = 100%
+        35 + 85 = 120%
+
+        Цель:
+        35 + 70 = 105%
+    */
+
     critDamage: {
-        min: 95,
-        max: 120,
-        target: 105
+        min: 65,
+        max: 85,
+        target: 70
     },
 
     attack: {
@@ -729,20 +745,36 @@ const RANGES = {
         target: 0
     },
 
+    /*
+        Перезарядка приёмов:
+
+        База = -15%
+
+        Итоговый допустимый диапазон:
+        -30% ... -20%
+
+        Поэтому проками необходимо получить:
+        -15% ... -5%
+    */
+
     cooldown: {
-        min: -50,
-        max: 0,
-        target: -30
+        min: -30,
+        max: -20,
+        target: -25
     }
 
 };
 
 
 /* =========================================================
-   БАЗОВЫЙ КРИТ
+   БАЗОВЫЕ ЗНАЧЕНИЯ
    ========================================================= */
 
 const BASE_CRIT = 20;
+
+const BASE_CRIT_DAMAGE = 35;
+
+const BASE_COOLDOWN = -15;
 
 
 /* =========================================================
@@ -1057,7 +1089,7 @@ function procValue(
 ) {
 
     /*
-        ИСПРАВЛЕННАЯ АТАКА
+        АТАКА
     */
 
     if (
@@ -1276,6 +1308,16 @@ function getEffectiveRange(
         RANGES[stat];
 
 
+    /*
+        Шанс крита:
+
+        Итоговый диапазон 70–90%,
+        но база уже даёт 20%.
+
+        Поэтому проками нужно получить
+        50–70%.
+    */
+
     if (
         stat === "crit"
     ) {
@@ -1289,6 +1331,61 @@ function getEffectiveRange(
             max:
                 range.max -
                 BASE_CRIT
+
+        };
+
+    }
+
+
+    /*
+        Урон крита:
+
+        RANGES содержит необходимый
+        бонус от проков: 65–85%.
+    */
+
+    if (
+        stat === "critDamage"
+    ) {
+
+        return {
+
+            min:
+                range.min,
+
+            max:
+                range.max
+
+        };
+
+    }
+
+
+    /*
+        Перезарядка:
+
+        База = -15%.
+
+        Итог должен быть
+        от -30% до -20%.
+
+        Поэтому проками необходимо
+        получить от -15% до -5%.
+    */
+
+    if (
+        stat === "cooldown"
+    ) {
+
+        return {
+
+            min:
+                range.min -
+                BASE_COOLDOWN,
+
+            max:
+                range.max -
+                BASE_COOLDOWN
 
         };
 
@@ -1328,14 +1425,57 @@ function stateStillPossible(
             totals[stat] || 0;
 
 
-        const maxPossible =
-            current +
-            slotsLeft * 48;
+        /*
+            Для атаки максимум одного
+            оставшегося слота = +48%.
+
+            Для остальных положительных
+            максимум = +45%.
+
+            Для cooldown значения отрицательные:
+            максимум (наименее отрицательное)
+            дополнительного изменения = -3%.
+
+            Минимум одного слота = -45%.
+        */
+
+        let maxPossible;
+        let minPossible;
 
 
-        const minPossible =
-            current -
-            slotsLeft * 45;
+        if (
+            stat === "attack"
+        ) {
+
+            maxPossible =
+                current +
+                slotsLeft * 48;
+
+            minPossible =
+                current;
+
+        } else if (
+            stat === "cooldown"
+        ) {
+
+            maxPossible =
+                current -
+                slotsLeft * 3;
+
+            minPossible =
+                current -
+                slotsLeft * 45;
+
+        } else {
+
+            maxPossible =
+                current +
+                slotsLeft * 45;
+
+            minPossible =
+                current;
+
+        }
 
 
         if (
@@ -1387,74 +1527,11 @@ function isValidFinalState(
 
 
         if (
-            stat === "crit" ||
-            stat === "penetration" ||
-            stat === "accuracy" ||
-            stat === "critDamage"
+            value < range.min ||
+            value > range.max
         ) {
 
-            if (
-                value < range.min ||
-                value > range.max
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        if (
-            stat === "attack"
-        ) {
-
-            if (
-                value <
-                RANGES.attack.min ||
-                value >
-                RANGES.attack.max
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        if (
-            stat === "meter"
-        ) {
-
-            if (
-                value <
-                RANGES.meter.min ||
-                value >
-                RANGES.meter.max
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        if (
-            stat === "cooldown"
-        ) {
-
-            if (
-                value <
-                RANGES.cooldown.min ||
-                value >
-                RANGES.cooldown.max
-            ) {
-
-                return false;
-
-            }
+            return false;
 
         }
 
@@ -1588,6 +1665,9 @@ function scoreState(
 
     /*
         Перезарядка
+
+        Чем сильнее отрицательное значение,
+        тем выше оценка.
     */
 
     if (
@@ -1754,6 +1834,14 @@ const BASE_CRIT =
     ${BASE_CRIT};
 
 
+const BASE_CRIT_DAMAGE =
+    ${BASE_CRIT_DAMAGE};
+
+
+const BASE_COOLDOWN =
+    ${BASE_COOLDOWN};
+
+
 /* =========================================================
    ЭФФЕКТИВНЫЙ ДИАПАЗОН
    ========================================================= */
@@ -1763,6 +1851,13 @@ function getEffectiveRange(stat) {
     const range =
         RANGES[stat];
 
+
+    /*
+        Шанс крита:
+        итог 70–90,
+        база 20,
+        проками 50–70.
+    */
 
     if (
         stat === "crit"
@@ -1783,11 +1878,67 @@ function getEffectiveRange(stat) {
     }
 
 
+    /*
+        Урон крита:
+        проками необходимо получить
+        +65% ... +85%.
+    */
+
+    if (
+        stat === "critDamage"
+    ) {
+
+        return {
+
+            min:
+                range.min,
+
+            max:
+                range.max
+
+        };
+
+    }
+
+
+    /*
+        Перезарядка:
+
+        База = -15%.
+
+        Итог:
+        -30% ... -20%.
+
+        Проками:
+        -15% ... -5%.
+    */
+
+    if (
+        stat === "cooldown"
+    ) {
+
+        return {
+
+            min:
+                range.min -
+                BASE_COOLDOWN,
+
+            max:
+                range.max -
+                BASE_COOLDOWN
+
+        };
+
+    }
+
+
     return {
 
-        min: range.min,
+        min:
+            range.min,
 
-        max: range.max
+        max:
+            range.max
 
     };
 
@@ -1796,14 +1947,6 @@ function getEffectiveRange(stat) {
 
 /* =========================================================
    ЗНАЧЕНИЕ ПРОКА
-   =========================================================
-
-   Здесь также исправлена АТАКА:
-
-   0 проков  = +6%
-   1 прок    = +9%
-   ...
-   14 проков = +48%
    ========================================================= */
 
 function procValue(
@@ -2025,7 +2168,7 @@ function addAssignment(
 
 
 /* =========================================================
-   ВОЗМОЖНОСТЬ
+   ВОЗМОЖНОСТЬ СОСТОЯНИЯ
    ========================================================= */
 
 function stateStillPossible(
@@ -2046,28 +2189,73 @@ function stateStillPossible(
             totals[stat] || 0;
 
 
-        /*
-            Для атаки максимум одного
-            оставшегося слота = 48%.
+        let maxPossible;
+        let minPossible;
 
-            Для остальных положительных
-            характеристик максимум = 45%.
+
+        /*
+            Атака
         */
 
-        const maxPerSlot =
+        if (
             stat === "attack"
-                ? 48
-                : 45;
+        ) {
+
+            maxPossible =
+                current +
+                slotsLeft * 48;
+
+            minPossible =
+                current;
+
+        }
 
 
-        const maxPossible =
-            current +
-            slotsLeft * maxPerSlot;
+        /*
+            Cooldown
+
+            Все значения отрицательные.
+
+            Максимально возможное значение
+            после оставшихся слотов:
+
+            -3% за слот.
+
+            Минимально возможное:
+
+            -45% за слот.
+        */
+
+        else if (
+            stat === "cooldown"
+        ) {
+
+            maxPossible =
+                current -
+                slotsLeft * 3;
+
+            minPossible =
+                current -
+                slotsLeft * 45;
+
+        }
 
 
-        const minPossible =
-            current -
-            slotsLeft * 45;
+        /*
+            Остальные положительные
+            характеристики.
+        */
+
+        else {
+
+            maxPossible =
+                current +
+                slotsLeft * 45;
+
+            minPossible =
+                current;
+
+        }
 
 
         if (
@@ -2119,74 +2307,11 @@ function isValidFinalState(
 
 
         if (
-            stat === "crit" ||
-            stat === "penetration" ||
-            stat === "accuracy" ||
-            stat === "critDamage"
+            value < range.min ||
+            value > range.max
         ) {
 
-            if (
-                value < range.min ||
-                value > range.max
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        if (
-            stat === "attack"
-        ) {
-
-            if (
-                value <
-                RANGES.attack.min ||
-                value >
-                RANGES.attack.max
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        if (
-            stat === "meter"
-        ) {
-
-            if (
-                value <
-                RANGES.meter.min ||
-                value >
-                RANGES.meter.max
-            ) {
-
-                return false;
-
-            }
-
-        }
-
-
-        if (
-            stat === "cooldown"
-        ) {
-
-            if (
-                value <
-                RANGES.cooldown.min ||
-                value >
-                RANGES.cooldown.max
-            ) {
-
-                return false;
-
-            }
+            return false;
 
         }
 
@@ -2519,7 +2644,7 @@ self.onmessage =
 
 
                     /*
-                        Отбрасываем только состояния,
+                        Отбрасываем состояния,
                         которые физически не смогут
                         попасть в нужный диапазон.
                     */
@@ -2562,7 +2687,7 @@ self.onmessage =
 
 
             /*
-                Повторная безопасная очистка.
+                Безопасная очистка.
             */
 
             states =
@@ -2982,7 +3107,7 @@ function showResult(
 
 
         /*
-            Добавляем базовый крит.
+            Добавляем базовый шанс крита.
         */
 
         if (
@@ -2991,6 +3116,35 @@ function showResult(
 
             value +=
                 BASE_CRIT;
+
+        }
+
+
+        /*
+            Добавляем базовый урон крита.
+        */
+
+        if (
+            stat === "critDamage"
+        ) {
+
+            value +=
+                BASE_CRIT_DAMAGE;
+
+        }
+
+
+        /*
+            Добавляем базовую
+            перезарядку -15%.
+        */
+
+        if (
+            stat === "cooldown"
+        ) {
+
+            value +=
+                BASE_COOLDOWN;
 
         }
 
@@ -3106,10 +3260,11 @@ function calculateUnused(
 
             <p>
 
-                Большие проки приоритетно
-                направляются в атаку и урон крита.
-                Средние — в шанс крита.
-                Маленькие и остаток — в проницание.
+                База перезарядки приёмов:
+                -15%.
+
+                Допустимый итоговый диапазон:
+                -20% ... -30%.
 
             </p>
 
