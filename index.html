@@ -1,8 +1,19 @@
-<!DOCTYPE html><html lang="ru">
+<!DOCTYPE html>
+<html lang="ru">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Калькулятор характеристик</title><style>
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Калькулятор характеристик</title>
+
+<style>
+
 * {
     box-sizing: border-box;
 }
@@ -203,73 +214,174 @@ button:disabled {
     .result-stat {
         font-size: 14px;
     }
+
 }
-</style></head><body><div class="container"><h1>Калькулятор характеристик</h1><!-- =====================================================
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Калькулятор характеристик</h1>
+
+
+<!-- =====================================================
      ВЫБОР ХАРАКТЕРИСТИК
-     ===================================================== --><div class="card"><h2>Выбор характеристик</h2>
+     ===================================================== -->
+
+<div class="card">
+
+<h2>Выбор характеристик</h2>
 
 <div class="stats-grid">
 
     <div class="stat">
+
         <label>
-            <input type="checkbox" class="stat-check" value="crit" checked>
+
+            <input
+                type="checkbox"
+                class="stat-check"
+                value="crit"
+                checked
+            >
+
             Шанс крита
+
         </label>
+
     </div>
 
+
     <div class="stat">
+
         <label>
-            <input type="checkbox" class="stat-check" value="penetration" checked>
+
+            <input
+                type="checkbox"
+                class="stat-check"
+                value="penetration"
+                checked
+            >
+
             Проницание
+
         </label>
+
     </div>
 
+
     <div class="stat">
+
         <label>
-            <input type="checkbox" class="stat-check" value="accuracy" checked>
+
+            <input
+                type="checkbox"
+                class="stat-check"
+                value="accuracy"
+                checked
+            >
+
             Точность
+
         </label>
+
     </div>
 
+
     <div class="stat">
+
         <label>
-            <input type="checkbox" class="stat-check" value="critDamage" checked>
+
+            <input
+                type="checkbox"
+                class="stat-check"
+                value="critDamage"
+                checked
+            >
+
             Урон крита
+
         </label>
+
     </div>
 
+
     <div class="stat">
+
         <label>
-            <input type="checkbox" class="stat-check" value="attack" checked>
+
+            <input
+                type="checkbox"
+                class="stat-check"
+                value="attack"
+                checked
+            >
+
             Атака
+
         </label>
+
     </div>
 
+
     <div class="stat">
+
         <label>
-            <input type="checkbox" class="stat-check" value="meter">
+
+            <input
+                type="checkbox"
+                class="stat-check"
+                value="meter"
+            >
+
             Прирост шкалы
+
         </label>
+
     </div>
 
+
     <div class="stat">
+
         <label>
-            <input type="checkbox" class="stat-check" value="cooldown">
+
+            <input
+                type="checkbox"
+                class="stat-check"
+                value="cooldown"
+            >
+
             Перезарядка приёмов
+
         </label>
+
     </div>
 
 </div>
 
-</div><!-- =====================================================
+</div>
+
+
+
+<!-- =====================================================
      ПРОКИ
-     ===================================================== --><div class="card"><h2>Проки</h2>
+     ===================================================== -->
+
+<div class="card">
+
+<h2>Проки</h2>
 
 <p>
     В каждом слоте сумма трёх проков должна быть ровно 14.
 </p>
 
+
 <div class="proc-grid">
+
 
     <!-- СЛОТ 1 -->
 
@@ -482,19 +594,39 @@ button:disabled {
 
 </div>
 
-<div id="validationError" class="error"></div>
 
-</div><!-- =====================================================
+<div
+    id="validationError"
+    class="error"
+></div>
+
+</div>
+
+
+
+<!-- =====================================================
      ИСПОЛЬЗОВАНИЕ
-     ===================================================== --><div class="card"><h2>Использование статы</h2>
+     ===================================================== -->
+
+<div class="card">
+
+<h2>Использование статы</h2>
 
 <div id="usage">
     Заполните проки и запустите расчёт.
 </div>
 
-</div><!-- =====================================================
+</div>
+
+
+
+<!-- =====================================================
      КНОПКА
-     ===================================================== --><div class="card"><button id="calculateButton">
+     ===================================================== -->
+
+<div class="card">
+
+<button id="calculateButton">
     Рассчитать оптимальную комбинацию
 </button>
 
@@ -504,13 +636,30 @@ button:disabled {
     aria-live="polite"
 ></div>
 
-</div><!-- =====================================================
+</div>
+
+
+
+<!-- =====================================================
      РЕЗУЛЬТАТ
-     ===================================================== --><div class="card result" id="result"><h2>Результат</h2>
+     ===================================================== -->
+
+<div
+    class="card result"
+    id="result"
+>
+
+<h2>Результат</h2>
 
 <div id="resultContent"></div>
 
-</div></div><script>
+</div>
+
+</div>
+
+
+
+<script>
 
 "use strict";
 
@@ -634,7 +783,11 @@ function getProcs() {
     const slots = [];
 
 
-    for (let slot = 0; slot < 5; slot++) {
+    for (
+        let slot = 0;
+        slot < 5;
+        slot++
+    ) {
 
         const cells =
             procCells.filter(
@@ -645,10 +798,6 @@ function getProcs() {
 
         const values =
             cells.map(cell => {
-
-                /*
-                    Пустое поле = 0
-                */
 
                 if (
                     cell.value.trim() === ""
@@ -881,15 +1030,25 @@ function updateProcSums() {
    ЗНАЧЕНИЕ ПРОКА
    =========================================================
 
-   Сохраняем механику исходного кода:
-
-   0 проков = 3%
-   1 прок  = 6%
-   2 прока = 9%
+   АТАКА:
+   0 проков  = +6%
+   1 прок    = +9%
+   2 прока   = +12%
    ...
-   14 проков = 45%
+   14 проков = +48%
 
-   Для cooldown значение отрицательное.
+   Остальные положительные:
+   0 проков  = +3%
+   1 прок    = +6%
+   2 прока   = +9%
+   ...
+   14 проков = +45%
+
+   Cooldown:
+   0 проков  = -3%
+   1 прок    = -6%
+   ...
+   14 проков = -45%
    ========================================================= */
 
 function procValue(
@@ -897,9 +1056,30 @@ function procValue(
     proc
 ) {
 
+    /*
+        ИСПРАВЛЕННАЯ АТАКА
+    */
+
+    if (
+        stat === "attack"
+    ) {
+
+        return 6 + (proc * 3);
+
+    }
+
+
+    /*
+        Остальные характеристики.
+    */
+
     const value =
         3 * (proc + 1);
 
+
+    /*
+        Перезарядка отрицательная.
+    */
 
     if (
         stat === "cooldown"
@@ -1014,15 +1194,6 @@ function generateAssignments(
     }
 
 
-    /*
-        Удаляем полностью одинаковые
-        распределения.
-
-        Это особенно полезно, когда
-        два или три проковых значения
-        одинаковые.
-    */
-
     const unique =
         new Map();
 
@@ -1095,20 +1266,6 @@ function addAssignment(
 
 /* =========================================================
    МИНИМАЛЬНОЕ И МАКСИМАЛЬНОЕ ЗНАЧЕНИЕ
-   =========================================================
-
-   Здесь исправлена важная ошибка исходного
-   алгоритма для крита.
-
-   BASE_CRIT = 20 уже существует.
-
-   Поэтому если итог должен быть 70–90,
-   проками необходимо получить только
-   50–70.
-
-   Раньше алгоритм требовал получить
-   проками все 70–90 и мог преждевременно
-   удалить правильное состояние.
    ========================================================= */
 
 function getEffectiveRange(
@@ -1171,29 +1328,15 @@ function stateStillPossible(
             totals[stat] || 0;
 
 
-        /*
-            Для обычных положительных статов
-            максимум, который ещё можно получить.
-        */
-
         const maxPossible =
             current +
-            slotsLeft * 45;
+            slotsLeft * 48;
 
-
-        /*
-            Минимум с учётом возможного
-            отрицательного cooldown.
-        */
 
         const minPossible =
             current -
             slotsLeft * 45;
 
-
-        /*
-            Нельзя опуститься ниже минимума.
-        */
 
         if (
             maxPossible <
@@ -1204,13 +1347,6 @@ function stateStillPossible(
 
         }
 
-
-        /*
-            Нельзя подняться выше максимума.
-
-            Для cooldown это особенно важно:
-            его значения отрицательные.
-        */
 
         if (
             minPossible >
@@ -1250,12 +1386,6 @@ function isValidFinalState(
             totals[stat] || 0;
 
 
-        /*
-            Все характеристики,
-            кроме специальных attack/meter,
-            имеют обязательный диапазон.
-        */
-
         if (
             stat === "crit" ||
             stat === "penetration" ||
@@ -1275,10 +1405,6 @@ function isValidFinalState(
         }
 
 
-        /*
-            Атака.
-        */
-
         if (
             stat === "attack"
         ) {
@@ -1297,10 +1423,6 @@ function isValidFinalState(
         }
 
 
-        /*
-            Прирост шкалы.
-        */
-
         if (
             stat === "meter"
         ) {
@@ -1318,10 +1440,6 @@ function isValidFinalState(
 
         }
 
-
-        /*
-            Перезарядка.
-        */
 
         if (
             stat === "cooldown"
@@ -1350,20 +1468,6 @@ function isValidFinalState(
 
 /* =========================================================
    ОЦЕНКА СОСТОЯНИЯ
-   =========================================================
-
-   Приоритет:
-
-   1. Атака
-   2. Урон крита
-   3. Шанс крита
-   4. Проницание
-   5. Точность
-   6. Прирост шкалы
-   7. Перезарядка
-
-   При этом обязательные диапазоны
-   проверяются отдельно.
    ========================================================= */
 
 function scoreState(
@@ -1375,7 +1479,7 @@ function scoreState(
 
 
     /*
-        АТАКА
+        Атака
     */
 
     if (
@@ -1393,7 +1497,7 @@ function scoreState(
 
 
     /*
-        УРОН КРИТА
+        Урон крита
     */
 
     if (
@@ -1411,7 +1515,7 @@ function scoreState(
 
 
     /*
-        ШАНС КРИТА
+        Шанс крита
     */
 
     if (
@@ -1429,7 +1533,7 @@ function scoreState(
 
 
     /*
-        ПРОНИЦАНИЕ
+        Проницание
     */
 
     if (
@@ -1447,7 +1551,7 @@ function scoreState(
 
 
     /*
-        ТОЧНОСТЬ
+        Точность
     */
 
     if (
@@ -1465,7 +1569,7 @@ function scoreState(
 
 
     /*
-        ПРИРОСТ ШКАЛЫ
+        Прирост шкалы
     */
 
     if (
@@ -1483,7 +1587,7 @@ function scoreState(
 
 
     /*
-        ПЕРЕЗАРЯДКА
+        Перезарядка
     */
 
     if (
@@ -1595,25 +1699,7 @@ function compressStates(
 
 
 /* =========================================================
-   БЕЗОПАСНОЕ СОКРАЩЕНИЕ СОСТОЯНИЙ
-   =========================================================
-
-   ВАЖНО:
-
-   Здесь больше НЕТ старого:
-
-       states.slice(0, 50000)
-
-   которое могло уничтожить правильную
-   комбинацию.
-
-   Вместо этого мы сначала отбрасываем
-   только состояния, которые уже физически
-   не могут попасть в требуемые диапазоны.
-
-   Если состояний действительно очень много,
-   применяем несколько проходов безопасного
-   удаления явно бесполезных состояний.
+   СОКРАЩЕНИЕ СОСТОЯНИЙ
    ========================================================= */
 
 function pruneStates(
@@ -1660,10 +1746,6 @@ function createWorker() {
 "use strict";
 
 
-/* =========================================================
-   НАСТРОЙКИ
-   ========================================================= */
-
 const RANGES =
     ${JSON.stringify(RANGES)};
 
@@ -1682,7 +1764,9 @@ function getEffectiveRange(stat) {
         RANGES[stat];
 
 
-    if (stat === "crit") {
+    if (
+        stat === "crit"
+    ) {
 
         return {
 
@@ -1712,6 +1796,14 @@ function getEffectiveRange(stat) {
 
 /* =========================================================
    ЗНАЧЕНИЕ ПРОКА
+   =========================================================
+
+   Здесь также исправлена АТАКА:
+
+   0 проков  = +6%
+   1 прок    = +9%
+   ...
+   14 проков = +48%
    ========================================================= */
 
 function procValue(
@@ -1719,9 +1811,30 @@ function procValue(
     proc
 ) {
 
+    /*
+        АТАКА
+    */
+
+    if (
+        stat === "attack"
+    ) {
+
+        return 6 + (proc * 3);
+
+    }
+
+
+    /*
+        Остальные статы
+    */
+
     const value =
         3 * (proc + 1);
 
+
+    /*
+        Cooldown
+    */
 
     if (
         stat === "cooldown"
@@ -1738,7 +1851,7 @@ function procValue(
 
 
 /* =========================================================
-   ГЕНЕРАЦИЯ
+   ГЕНЕРАЦИЯ РАСПРЕДЕЛЕНИЙ
    ========================================================= */
 
 function generateAssignments(
@@ -1839,10 +1952,6 @@ function generateAssignments(
     }
 
 
-    /*
-        Удаляем дубли.
-    */
-
     const unique =
         new Map();
 
@@ -1937,21 +2046,29 @@ function stateStillPossible(
             totals[stat] || 0;
 
 
+        /*
+            Для атаки максимум одного
+            оставшегося слота = 48%.
+
+            Для остальных положительных
+            характеристик максимум = 45%.
+        */
+
+        const maxPerSlot =
+            stat === "attack"
+                ? 48
+                : 45;
+
+
         const maxPossible =
             current +
-            slotsLeft * 45;
+            slotsLeft * maxPerSlot;
 
 
         const minPossible =
             current -
             slotsLeft * 45;
 
-
-        /*
-            Даже если все оставшиеся
-            слоты дадут максимум,
-            минимум должен быть достижим.
-        */
 
         if (
             maxPossible <
@@ -1962,12 +2079,6 @@ function stateStillPossible(
 
         }
 
-
-        /*
-            И наоборот:
-            состояние не должно уже
-            гарантированно уйти выше максимума.
-        */
 
         if (
             minPossible >
@@ -2340,8 +2451,7 @@ self.onmessage =
 
 
         /*
-            Создаём варианты
-            каждого слота.
+            Создаём варианты каждого слота.
         */
 
         const assignments =
@@ -2369,8 +2479,7 @@ self.onmessage =
 
 
         /*
-            Последовательно обрабатываем
-            пять слотов.
+            Обрабатываем пять слотов.
         */
 
         for (
@@ -2410,8 +2519,9 @@ self.onmessage =
 
 
                     /*
-                        Сразу отбрасываем
-                        невозможные состояния.
+                        Отбрасываем только состояния,
+                        которые физически не смогут
+                        попасть в нужный диапазон.
                     */
 
                     if (
@@ -2441,8 +2551,7 @@ self.onmessage =
 
 
             /*
-                Сжимаем одинаковые
-                итоговые состояния.
+                Сжимаем одинаковые состояния.
             */
 
             states =
@@ -2453,8 +2562,7 @@ self.onmessage =
 
 
             /*
-                Ещё раз удаляем невозможные
-                состояния после сжатия.
+                Повторная безопасная очистка.
             */
 
             states =
@@ -2828,15 +2936,21 @@ function showResult(
                 <div class="result-stat">
 
                     <span>
+
                         Ячейка ${cellIndex + 1}:
+
                         <strong>
                             ${STAT_NAMES[item.stat]}
                         </strong>
+
                     </span>
 
                     <span>
+
                         ${item.proc} проков
+
                         (${formatPercent(item.value)})
+
                     </span>
 
                 </div>
@@ -2991,10 +3105,12 @@ function calculateUnused(
 
 
             <p>
+
                 Большие проки приоритетно
                 направляются в атаку и урон крита.
                 Средние — в шанс крита.
                 Маленькие и остаток — в проницание.
+
             </p>
 
         </div>
@@ -3153,5 +3269,8 @@ updateProcSums();
 
 updateUsage();
 
-</script></body>
+</script>
+
+</body>
+
 </html>
