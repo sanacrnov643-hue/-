@@ -1,11 +1,715 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Мой сайт</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор характеристик</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        background: #111318;
+        color: #f1f1f1;
+        font-family: Arial, sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+
+    .panel {
+        max-width: 900px;
+        margin: 0 auto 20px;
+        padding: 20px;
+        background: #1b1e25;
+        border-radius: 14px;
+    }
+
+    .stats-select {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+    }
+
+    label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        background: #252933;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        margin-top: 18px;
+        border: 0;
+        border-radius: 10px;
+        background: #7c5cff;
+        color: white;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #9278ff;
+    }
+
+    .slots {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .slot {
+        background: #252933;
+        border-radius: 12px;
+        padding: 15px;
+    }
+
+    .slot h3 {
+        margin-top: 0;
+        text-align: center;
+    }
+
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 9px 0;
+        border-bottom: 1px solid #393d47;
+    }
+
+    .stat-row:last-child {
+        border-bottom: none;
+    }
+
+    .summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 10px;
+    }
+
+    .summary-item {
+        background: #252933;
+        padding: 13px;
+        border-radius: 9px;
+    }
+
+    .summary-item strong {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .remaining {
+        border: 1px solid #7c5cff;
+    }
+
+    .error {
+        color: #ff7777;
+        line-height: 1.5;
+    }
+
+    .note {
+        color: #aaa;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+</style>
 </head>
+
 <body>
-    <h1>Привет!</h1>
-    <p>Я создал свой первый сайт!</p>
+
+<h1>Калькулятор характеристик</h1>
+
+<div class="panel">
+    <h2>Доступные характеристики</h2>
+
+    <div class="stats-select">
+        <label>
+            <input type="checkbox" value="crit" checked>
+            Шанс крита
+        </label>
+
+        <label>
+            <input type="checkbox" value="penetration" checked>
+            Проницание
+        </label>
+
+        <label>
+            <input type="checkbox" value="accuracy" checked>
+            Точность
+        </label>
+
+        <label>
+            <input type="checkbox" value="critDamage" checked>
+            Урон крита
+        </label>
+
+        <label>
+            <input type="checkbox" value="attack" checked>
+            Атака
+        </label>
+
+        <label>
+            <input type="checkbox" value="meter">
+            Прирост шкалы
+        </label>
+
+        <label>
+            <input type="checkbox" value="cooldown">
+            Перезарядка приёмов
+        </label>
+    </div>
+
+    <button onclick="calculate()">Найти оптимальную комбинацию</button>
+
+    <p class="note">
+        Каждый слот содержит 3 разные характеристики и ровно 14 проков.
+        Одна и та же характеристика может находиться в разных слотах.
+    </p>
+</div>
+
+<div id="error" class="panel" style="display:none;"></div>
+
+<div id="result" style="display:none;">
+
+    <div class="panel">
+        <h2>Итоговые характеристики</h2>
+        <div id="summary" class="summary"></div>
+    </div>
+
+    <div class="panel">
+        <h2>Остаток характеристики</h2>
+        <div id="remaining" class="summary"></div>
+    </div>
+
+    <div class="panel">
+        <h2>Оптимальная комбинация</h2>
+        <div id="slots" class="slots"></div>
+    </div>
+
+</div>
+
+<script>
+
+const STAT_NAMES = {
+    crit: "Шанс крита",
+    penetration: "Проницание",
+    accuracy: "Точность",
+    critDamage: "Урон крита",
+    attack: "Атака",
+    meter: "Прирост шкалы",
+    cooldown: "Перезарядка приёмов"
+};
+
+const RANGES = {
+    crit: [70, 90],
+    penetration: [45, 55],
+    accuracy: [30, 55],
+    critDamage: [95, 120]
+};
+
+const MIDPOINTS = {
+    crit: 80,
+    penetration: 50,
+    accuracy: 42.5,
+    critDamage: 107.5
+};
+
+
+// ---------------------------------------------------------
+// Получение доступных характеристик
+// ---------------------------------------------------------
+
+function getEnabledStats() {
+    return [...document.querySelectorAll(
+        '.stats-select input[type="checkbox"]:checked'
+    )].map(x => x.value);
+}
+
+
+// ---------------------------------------------------------
+// Все варианты распределения 14 проков между 3 статами
+// ---------------------------------------------------------
+
+function generateProcSplits() {
+    const result = [];
+
+    for (let a = 0; a <= 14; a++) {
+        for (let b = 0; b <= 14 - a; b++) {
+            const c = 14 - a - b;
+
+            result.push([a, b, c]);
+        }
+    }
+
+    return result;
+}
+
+const PROC_SPLITS = generateProcSplits();
+
+
+// ---------------------------------------------------------
+// Комбинации трёх разных характеристик
+// ---------------------------------------------------------
+
+function generateCombinations(array, size) {
+    const result = [];
+
+    function recursive(start, current) {
+        if (current.length === size) {
+            result.push([...current]);
+            return;
+        }
+
+        for (let i = start; i < array.length; i++) {
+            current.push(array[i]);
+            recursive(i + 1, current);
+            current.pop();
+        }
+    }
+
+    recursive(0, []);
+
+    return result;
+}
+
+
+// ---------------------------------------------------------
+// Создание всех возможных вариантов одного слота
+// ---------------------------------------------------------
+
+function generateSlotOptions(enabledStats) {
+
+    const combinations = generateCombinations(enabledStats, 3);
+    const options = [];
+
+    for (const stats of combinations) {
+
+        for (const split of PROC_SPLITS) {
+
+            const values = {};
+
+            for (let i = 0; i < 3; i++) {
+                values[stats[i]] = split[i];
+            }
+
+            options.push({
+                stats: [...stats],
+                procs: [...split],
+                values
+            });
+        }
+    }
+
+    return options;
+}
+
+
+// ---------------------------------------------------------
+// Расчёт процентов
+// ---------------------------------------------------------
+
+function calculateTotals(chosenSlots, enabledStats) {
+
+    const occurrences = {};
+    const procs = {};
+
+    for (const stat of enabledStats) {
+        occurrences[stat] = 0;
+        procs[stat] = 0;
+    }
+
+    for (const slot of chosenSlots) {
+
+        for (let i = 0; i < slot.stats.length; i++) {
+
+            const stat = slot.stats[i];
+
+            occurrences[stat]++;
+            procs[stat] += slot.procs[i];
+        }
+    }
+
+    const totals = {};
+
+    for (const stat of enabledStats) {
+
+        const units =
+            (occurrences[stat] || 0) +
+            (procs[stat] || 0);
+
+        let value = units * 3;
+
+        if (stat === "cooldown") {
+            value = -value;
+        }
+
+        totals[stat] = value;
+    }
+
+    // Базовые 20% крита персонажа
+    if (enabledStats.includes("crit")) {
+        totals.crit += 20;
+    }
+
+    return totals;
+}
+
+
+// ---------------------------------------------------------
+// Насколько комбинация соответствует оптимальным диапазонам
+// ---------------------------------------------------------
+
+function calculateScore(totals, enabledStats) {
+
+    let score = 0;
+
+    const coreStats = [
+        "crit",
+        "penetration",
+        "accuracy",
+        "critDamage"
+    ];
+
+    for (const stat of coreStats) {
+
+        if (!enabledStats.includes(stat)) {
+            continue;
+        }
+
+        const value = totals[stat] || 0;
+        const range = RANGES[stat];
+
+        // Сначала сильно штрафуем выход за допустимый диапазон
+        if (value < range[0]) {
+            score += 100000 + (range[0] - value) * 1000;
+        }
+
+        if (value > range[1]) {
+            score += 100000 + (value - range[1]) * 1000;
+        }
+
+        // Затем стремимся к середине диапазона
+        score += Math.pow(value - MIDPOINTS[stat], 2);
+    }
+
+    // При равных условиях предпочитаем больше атаки
+    if (enabledStats.includes("attack")) {
+        score -= (totals.attack || 0) * 0.01;
+    }
+
+    return score;
+}
+
+
+// ---------------------------------------------------------
+// Дополнительная проверка
+// ---------------------------------------------------------
+
+function isValid(totals, enabledStats) {
+
+    for (const stat of [
+        "crit",
+        "penetration",
+        "accuracy",
+        "critDamage"
+    ]) {
+
+        if (!enabledStats.includes(stat)) {
+            continue;
+        }
+
+        const [min, max] = RANGES[stat];
+        const value = totals[stat] || 0;
+
+        if (value < min || value > max) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+// ---------------------------------------------------------
+// Оптимизатор
+// ---------------------------------------------------------
+
+function findBestCombination(enabledStats) {
+
+    if (enabledStats.length < 3) {
+        return null;
+    }
+
+    const slotOptions = generateSlotOptions(enabledStats);
+
+    let best = null;
+    let bestScore = Infinity;
+
+    /*
+       Используем beam search.
+
+       Вместо перебора абсолютно всех комбинаций
+       5 слотов (что было бы слишком много),
+       сохраняем наиболее перспективные состояния.
+    */
+
+    let states = [{
+        slots: [],
+        totals: {}
+    }];
+
+    const BEAM_SIZE = 5000;
+
+    for (let slotIndex = 0; slotIndex < 5; slotIndex++) {
+
+        const next = [];
+
+        for (const state of states) {
+
+            for (const option of slotOptions) {
+
+                const newSlots = [...state.slots, option];
+
+                const totals = calculateTotals(
+                    newSlots,
+                    enabledStats
+                );
+
+                const score = calculateScore(
+                    totals,
+                    enabledStats
+                );
+
+                next.push({
+                    slots: newSlots,
+                    totals,
+                    score
+                });
+            }
+        }
+
+        next.sort((a, b) => a.score - b.score);
+
+        states = next.slice(0, BEAM_SIZE);
+    }
+
+    for (const state of states) {
+
+        const totals = state.totals;
+
+        let score = calculateScore(
+            totals,
+            enabledStats
+        );
+
+        if (isValid(totals, enabledStats)) {
+
+            // Сильный приоритет валидным комбинациям
+            score -= 1000000;
+
+            if (enabledStats.includes("attack")) {
+                score -= (totals.attack || 0) * 0.1;
+            }
+
+            if (score < bestScore) {
+                bestScore = score;
+
+                best = {
+                    slots: state.slots,
+                    totals
+                };
+            }
+        }
+    }
+
+    // Если полностью валидного варианта нет,
+    // возвращаем наиболее близкий вариант.
+    if (!best && states.length > 0) {
+
+        states.sort((a, b) => a.score - b.score);
+
+        best = {
+            slots: states[0].slots,
+            totals: states[0].totals
+        };
+    }
+
+    return best;
+}
+
+
+// ---------------------------------------------------------
+// Отображение результата
+// ---------------------------------------------------------
+
+function calculate() {
+
+    const enabledStats = getEnabledStats();
+
+    const error = document.getElementById("error");
+    const result = document.getElementById("result");
+
+    error.style.display = "none";
+    result.style.display = "none";
+
+    if (enabledStats.length < 3) {
+
+        error.innerHTML =
+            '<div class="error">' +
+            'Нужно выбрать минимум 3 характеристики.' +
+            '</div>';
+
+        error.style.display = "block";
+        return;
+    }
+
+    const best = findBestCombination(enabledStats);
+
+    if (!best) {
+
+        error.innerHTML =
+            '<div class="error">' +
+            'Не удалось найти комбинацию.' +
+            '</div>';
+
+        error.style.display = "block";
+        return;
+    }
+
+    displayResult(best, enabledStats);
+
+    result.style.display = "block";
+}
+
+
+// ---------------------------------------------------------
+// Вывод результатов
+// ---------------------------------------------------------
+
+function displayResult(best, enabledStats) {
+
+    const summary = document.getElementById("summary");
+    const remaining = document.getElementById("remaining");
+    const slots = document.getElementById("slots");
+
+    summary.innerHTML = "";
+    remaining.innerHTML = "";
+    slots.innerHTML = "";
+
+    const totals = best.totals;
+
+    for (const stat of enabledStats) {
+
+        const div = document.createElement("div");
+        div.className = "summary-item";
+
+        div.innerHTML =
+            "<strong>" + STAT_NAMES[stat] + "</strong>" +
+            formatPercent(totals[stat] || 0);
+
+        summary.appendChild(div);
+    }
+
+    // Остаточные характеристики
+    const remainingStats = [
+        "attack",
+        "meter",
+        "cooldown"
+    ];
+
+    for (const stat of remainingStats) {
+
+        if (!enabledStats.includes(stat)) {
+            continue;
+        }
+
+        const div = document.createElement("div");
+        div.className = "summary-item remaining";
+
+        div.innerHTML =
+            "<strong>" + STAT_NAMES[stat] + "</strong>" +
+            formatPercent(totals[stat] || 0);
+
+        remaining.appendChild(div);
+    }
+
+    if (remaining.innerHTML === "") {
+
+        remaining.innerHTML =
+            '<div class="summary-item">' +
+            '<strong>Нет</strong>' +
+            'Дополнительные характеристики не включены.' +
+            '</div>';
+    }
+
+    // Слоты
+    best.slots.forEach((slot, index) => {
+
+        const div = document.createElement("div");
+        div.className = "slot";
+
+        let html =
+            "<h3>Слот " + (index + 1) + "</h3>";
+
+        for (let i = 0; i < 3; i++) {
+
+            const stat = slot.stats[i];
+            const proc = slot.procs[i];
+
+            html +=
+                '<div class="stat-row">' +
+                    '<span>' +
+                        STAT_NAMES[stat] +
+                    '</span>' +
+                    '<strong>' +
+                        proc +
+                        ' проков' +
+                    '</strong>' +
+                '</div>';
+        }
+
+        html +=
+            '<p class="note">' +
+            'Всего проков: 14' +
+            '</p>';
+
+        div.innerHTML = html;
+
+        slots.appendChild(div);
+    });
+}
+
+
+function formatPercent(value) {
+
+    if (Number.isInteger(value)) {
+        return value + "%";
+    }
+
+    return value.toFixed(1) + "%";
+}
+
+</script>
+
 </body>
 </html>
