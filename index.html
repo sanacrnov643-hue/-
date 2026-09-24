@@ -439,20 +439,9 @@ button:disabled {
     type="checkbox"
     class="stat-check"
     value="meter"
+    checked
 >
 Прирост шкалы
-</label>
-</div>
-
-
-<div class="stat">
-<label>
-<input
-    type="checkbox"
-    class="stat-check"
-    value="cooldown"
->
-Перезарядка приёмов
 </label>
 </div>
 
@@ -730,10 +719,7 @@ const STAT_NAMES = {
         "Атака",
 
     meter:
-        "Прирост шкалы",
-
-    cooldown:
-        "Перезарядка приёмов"
+        "Прирост шкалы"
 
 };
 
@@ -761,9 +747,7 @@ const DEFAULT_TARGETS = {
 
     attack: 225,
 
-    meter: 100,
-
-    cooldown: -25
+    meter: 100
 
 };
 
@@ -777,8 +761,6 @@ const BASE_VALUES = {
     crit: 20,
 
     critDamage: 35,
-
-    cooldown: -15,
 
     penetration: 0,
 
@@ -802,8 +784,7 @@ const TIE_BREAK_PRIORITY = [
     "crit",
     "penetration",
     "accuracy",
-    "meter",
-    "cooldown"
+    "meter"
 
 ];
 
@@ -1301,32 +1282,10 @@ function procValue(
         14 -> 45
     */
 
-    const value =
-        3 *
+    return 3 *
         (
             proc + 1
         );
-
-
-    /*
-        Перезарядка:
-
-        0 -> -3
-        1 -> -6
-        ...
-        14 -> -45
-    */
-
-    if (
-        stat === "cooldown"
-    ) {
-
-        return -value;
-
-    }
-
-
-    return value;
 
 }
 
@@ -1350,31 +1309,6 @@ function finalValue(
 
 /* =========================================================
    АНАЛИЗ ОТНОСИТЕЛЬНО ЦЕЛИ
-   =========================================================
-
-   ВАЖНО:
-
-   Здесь больше НЕТ жёсткого диапазона.
-
-   Любой результат считается допустимым.
-
-   Если:
-
-   цель = 50
-   результат = 48
-
-   потеря = 2
-
-   Если:
-
-   цель = 50
-   результат = 52
-
-   потеря = 0
-   перелив = 2
-
-   Именно это позволяет калькулятору
-   всегда искать лучший возможный вариант.
    ========================================================= */
 
 function analyzeStat(
@@ -1652,24 +1586,6 @@ function compareSolutions(
     }
 
 
-    /*
-        ПРИОРИТЕТ 1
-
-        Минимум потерь.
-
-        Поэтому:
-
-        52 при цели 50
-        лучше
-
-        48 при цели 50.
-
-        Потому что:
-
-        52 -> потеря 0
-        48 -> потеря 2
-    */
-
     if (
         aDeficit !==
         bDeficit
@@ -1682,13 +1598,6 @@ function compareSolutions(
 
     }
 
-
-    /*
-        ПРИОРИТЕТ 2
-
-        Если потерь одинаково,
-        стараемся минимизировать перелив.
-    */
 
     if (
         aOverflow !==
@@ -1703,12 +1612,6 @@ function compareSolutions(
     }
 
 
-    /*
-        ПРИОРИТЕТ 3
-
-        Общее расстояние до целей.
-    */
-
     if (
         aDistance !==
         bDistance
@@ -1721,12 +1624,6 @@ function compareSolutions(
 
     }
 
-
-    /*
-        ПРИОРИТЕТ 4
-
-        Tie-break по статам.
-    */
 
     for (
         const stat
@@ -1751,34 +1648,10 @@ function compareSolutions(
 
 
         if (
-            stat === "cooldown"
+            av !== bv
         ) {
 
-            /*
-                Для cooldown:
-
-                -30 лучше -25,
-                если все предыдущие
-                критерии равны.
-            */
-
-            if (
-                av !== bv
-            ) {
-
-                return av < bv;
-
-            }
-
-        } else {
-
-            if (
-                av !== bv
-            ) {
-
-                return av > bv;
-
-            }
+            return av > bv;
 
         }
 
@@ -1907,23 +1780,10 @@ function procValue(
     }
 
 
-    const value =
-        3 *
+    return 3 *
         (
             proc + 1
         );
-
-
-    if (
-        stat === "cooldown"
-    ) {
-
-        return -value;
-
-    }
-
-
-    return value;
 
 }
 
@@ -2218,11 +2078,6 @@ function better(
     }
 
 
-    /*
-        1.
-        Минимум потерь.
-    */
-
     if (
         aDeficit !==
         bDeficit
@@ -2235,11 +2090,6 @@ function better(
 
     }
 
-
-    /*
-        2.
-        Минимум перелива.
-    */
 
     if (
         aOverflow !==
@@ -2254,11 +2104,6 @@ function better(
     }
 
 
-    /*
-        3.
-        Минимум расстояния.
-    */
-
     if (
         aDistance !==
         bDistance
@@ -2271,11 +2116,6 @@ function better(
 
     }
 
-
-    /*
-        4.
-        Tie-break.
-    */
 
     for (
         const stat
@@ -2300,26 +2140,10 @@ function better(
 
 
         if (
-            stat === "cooldown"
+            av !== bv
         ) {
 
-            if (
-                av !== bv
-            ) {
-
-                return av < bv;
-
-            }
-
-        } else {
-
-            if (
-                av !== bv
-            ) {
-
-                return av > bv;
-
-            }
+            return av > bv;
 
         }
 
@@ -2458,24 +2282,6 @@ function(event) {
         ];
 
 
-        /*
-            DP по пяти слотам.
-
-            В отличие от старой версии
-            здесь НЕТ проверки:
-
-            "если стат не входит
-             в диапазон — удалить".
-
-            Поэтому невозможная цель
-            больше не приводит
-            к сообщению
-            "комбинаций нет".
-
-            Алгоритм всегда пытается
-            найти ближайший вариант.
-        */
-
         for (
             let slotIndex = 0;
             slotIndex < 5;
@@ -2540,12 +2346,6 @@ function(event) {
 
         }
 
-
-        /*
-            Ищем лучший вариант
-            даже если он не может
-            точно достичь целей.
-        */
 
         let best =
             null;
@@ -2946,10 +2746,6 @@ function showResult(
     `;
 
 
-    /* =====================================================
-       ТАБЛИЦА ПОТЕРЬ
-       ===================================================== */
-
     html += `
 
         <h3>
@@ -3093,10 +2889,6 @@ function showResult(
 
     `;
 
-
-    /* =====================================================
-       ОБЩИЙ ИТОГ
-       ===================================================== */
 
     html += `
 
@@ -3466,13 +3258,6 @@ function startCalculation() {
 
                 worker.terminate();
 
-
-                /*
-                    Теперь result практически
-                    всегда существует, потому что
-                    больше нет жёсткого требования
-                    попасть в диапазоны.
-                */
 
                 if (
                     !data.result
