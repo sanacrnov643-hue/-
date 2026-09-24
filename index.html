@@ -51,6 +51,11 @@ h3 {
     margin-bottom: 20px;
 }
 
+
+/* =========================================================
+   ВЫБОР ХАРАКТЕРИСТИК
+   ========================================================= */
+
 .stats-grid {
     display: grid;
     grid-template-columns:
@@ -124,7 +129,7 @@ h3 {
 
 
 /* =========================================================
-   ПРОКИ
+   ОБЫЧНЫЕ 5 СЛОТОВ
    ========================================================= */
 
 .proc-grid {
@@ -183,6 +188,117 @@ h3 {
 }
 
 
+/* =========================================================
+   ПРИГЛАШЁННАЯ ЗВЕЗДА
+   ========================================================= */
+
+.invited-star {
+    margin-top: 25px;
+    padding: 18px;
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #21143f,
+            #17122e
+        );
+
+    border: 2px solid #7c3aed;
+
+    box-shadow:
+        0 0 18px rgba(
+            124,
+            58,
+            237,
+            0.18
+        );
+}
+
+.invited-star-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.invited-star-title {
+    color: #c4b5fd;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.invited-star-subtitle {
+    margin-top: 6px;
+    color: #a78bfa;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.invited-star-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(120px, 1fr));
+
+    gap: 10px;
+}
+
+.invited-star-slot {
+    background: #111827;
+    padding: 10px;
+    border-radius: 10px;
+
+    border: 1px solid #6d28d9;
+}
+
+.invited-star-cell {
+    width: 100%;
+    padding: 9px;
+
+    border: 1px solid #7c3aed;
+    border-radius: 7px;
+
+    background: #1f2937;
+    color: white;
+
+    text-align: center;
+    font-size: 16px;
+}
+
+.invited-star-cell:focus {
+    outline: 2px solid #a78bfa;
+}
+
+.invited-star-cell::placeholder {
+    color: #9ca3af;
+}
+
+.invited-star-sum {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.invited-star-sum.ok {
+    color: #4ade80;
+}
+
+.invited-star-sum.bad {
+    color: #f87171;
+}
+
+.invited-star-zero {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+
+/* =========================================================
+   КНОПКИ
+   ========================================================= */
+
 button {
     width: 100%;
     padding: 15px;
@@ -204,12 +320,22 @@ button:disabled {
     cursor: not-allowed;
 }
 
+
+/* =========================================================
+   ПРОГРЕСС
+   ========================================================= */
+
 .progress {
     margin-top: 15px;
     text-align: center;
     color: #93c5fd;
     min-height: 20px;
 }
+
+
+/* =========================================================
+   РЕЗУЛЬТАТ
+   ========================================================= */
 
 .result {
     display: none;
@@ -220,6 +346,21 @@ button:disabled {
     padding: 15px;
     background: #111827;
     border-radius: 10px;
+}
+
+.invited-star-result {
+    border: 2px solid #7c3aed;
+
+    background:
+        linear-gradient(
+            135deg,
+            #21143f,
+            #17122e
+        );
+}
+
+.invited-star-result h3 {
+    color: #c4b5fd;
 }
 
 .result-stat {
@@ -314,6 +455,11 @@ button:disabled {
     color: #93c5fd;
 }
 
+
+/* =========================================================
+   МОБИЛЬНАЯ ВЕРСИЯ
+   ========================================================= */
+
 @media (max-width: 700px) {
 
     body {
@@ -327,6 +473,13 @@ button:disabled {
     .proc-grid {
         grid-template-columns:
             repeat(5, 105px);
+    }
+
+    .invited-star-grid {
+        grid-template-columns:
+            repeat(3, 105px);
+
+        overflow-x: auto;
     }
 
     .result-stat {
@@ -370,78 +523,96 @@ button:disabled {
 
 <div class="stat">
 <label>
+
 <input
     type="checkbox"
     class="stat-check"
     value="crit"
     checked
 >
+
 Шанс крита
+
 </label>
 </div>
 
 
 <div class="stat">
 <label>
+
 <input
     type="checkbox"
     class="stat-check"
     value="penetration"
     checked
 >
+
 Проницание
+
 </label>
 </div>
 
 
 <div class="stat">
 <label>
+
 <input
     type="checkbox"
     class="stat-check"
     value="accuracy"
     checked
 >
+
 Точность
+
 </label>
 </div>
 
 
 <div class="stat">
 <label>
+
 <input
     type="checkbox"
     class="stat-check"
     value="critDamage"
     checked
 >
+
 Урон крита
+
 </label>
 </div>
 
 
 <div class="stat">
 <label>
+
 <input
     type="checkbox"
     class="stat-check"
     value="attack"
     checked
 >
+
 Атака
+
 </label>
 </div>
 
 
 <div class="stat">
 <label>
+
 <input
     type="checkbox"
     class="stat-check"
     value="meter"
     checked
 >
+
 Прирост шкалы
+
 </label>
 </div>
 
@@ -494,12 +665,15 @@ button:disabled {
 </h2>
 
 <p>
-    В каждом слоте сумма трёх проков должна быть ровно 14.
+    В каждом из пяти обычных слотов сумма трёх проков
+    должна быть ровно 14.
 </p>
 
 
 <div class="proc-grid">
 
+
+<!-- СЛОТ 1 -->
 
 <div class="slot">
 
@@ -507,17 +681,35 @@ button:disabled {
     Слот 1
 </div>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="0">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="0"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="0">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="0"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="0">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="0"
+>
 
 <div class="proc-sum">
     Сумма: <span>0</span>
@@ -525,6 +717,8 @@ button:disabled {
 
 </div>
 
+
+<!-- СЛОТ 2 -->
 
 <div class="slot">
 
@@ -532,17 +726,35 @@ button:disabled {
     Слот 2
 </div>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="1">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="1"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="1">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="1"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="1">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="1"
+>
 
 <div class="proc-sum">
     Сумма: <span>0</span>
@@ -550,6 +762,8 @@ button:disabled {
 
 </div>
 
+
+<!-- СЛОТ 3 -->
 
 <div class="slot">
 
@@ -557,17 +771,35 @@ button:disabled {
     Слот 3
 </div>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="2">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="2"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="2">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="2"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="2">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="2"
+>
 
 <div class="proc-sum">
     Сумма: <span>0</span>
@@ -575,6 +807,8 @@ button:disabled {
 
 </div>
 
+
+<!-- СЛОТ 4 -->
 
 <div class="slot">
 
@@ -582,17 +816,35 @@ button:disabled {
     Слот 4
 </div>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="3">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="3"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="3">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="3"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="3">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="3"
+>
 
 <div class="proc-sum">
     Сумма: <span>0</span>
@@ -600,6 +852,8 @@ button:disabled {
 
 </div>
 
+
+<!-- СЛОТ 5 -->
 
 <div class="slot">
 
@@ -607,21 +861,155 @@ button:disabled {
     Слот 5
 </div>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="4">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="4"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="4">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="4"
+>
 
-<input class="proc-cell" type="number"
-       min="0" max="14" step="1"
-       placeholder="Проки" data-slot="4">
+<input
+    class="proc-cell"
+    type="number"
+    min="0"
+    max="14"
+    step="1"
+    placeholder="Проки"
+    data-slot="4"
+>
 
 <div class="proc-sum">
     Сумма: <span>0</span>
 </div>
+
+</div>
+
+
+</div>
+
+
+<!-- =====================================================
+     ПРИГЛАШЁННАЯ ЗВЕЗДА
+     ===================================================== -->
+
+<div class="invited-star">
+
+<div class="invited-star-header">
+
+<div class="invited-star-title">
+    ★ Приглашённая звезда
+</div>
+
+<div class="invited-star-subtitle">
+
+    Отдельный слот, работающий по принципу
+    ББ и особых приёмов.
+
+    Три разные характеристики.
+    Сумма проков — ровно 19.
+    Не более одного нулевого прокa.
+
+    <br><br>
+
+    Обычные характеристики:
+    0 проков = 2%,
+    каждый следующий прок = +2%.
+
+    <br>
+
+    Атака:
+    0 проков = 4%,
+    каждый следующий прок = +2%.
+
+</div>
+
+</div>
+
+
+<div class="invited-star-grid">
+
+
+<div class="invited-star-slot">
+
+<input
+    class="invited-star-cell"
+    type="number"
+    min="0"
+    max="19"
+    step="1"
+    placeholder="Проки"
+    data-invited-slot="0"
+>
+
+</div>
+
+
+<div class="invited-star-slot">
+
+<input
+    class="invited-star-cell"
+    type="number"
+    min="0"
+    max="19"
+    step="1"
+    placeholder="Проки"
+    data-invited-slot="1"
+>
+
+</div>
+
+
+<div class="invited-star-slot">
+
+<input
+    class="invited-star-cell"
+    type="number"
+    min="0"
+    max="19"
+    step="1"
+    placeholder="Проки"
+    data-invited-slot="2"
+>
+
+</div>
+
+
+</div>
+
+
+<div
+    id="invitedStarSum"
+    class="invited-star-sum bad"
+>
+
+    Сумма:
+    <span>0</span>
+    / 19
+
+</div>
+
+
+<div
+    id="invitedStarZero"
+    class="invited-star-zero"
+>
+
+    Нулевых проков:
+    <span>3</span>
+    / максимум 1
 
 </div>
 
@@ -698,7 +1086,7 @@ button:disabled {
 
 
 /* =========================================================
-   НАЗВАНИЯ
+   НАЗВАНИЯ ХАРАКТЕРИСТИК
    ========================================================= */
 
 const STAT_NAMES = {
@@ -726,13 +1114,6 @@ const STAT_NAMES = {
 
 /* =========================================================
    НАЧАЛЬНЫЕ ЦЕЛИ
-   =========================================================
-
-   Здесь находятся значения,
-   которые будут показаны пользователю
-   при первом запуске.
-
-   Их можно менять прямо в интерфейсе.
    ========================================================= */
 
 const DEFAULT_TARGETS = {
@@ -774,7 +1155,7 @@ const BASE_VALUES = {
 
 
 /* =========================================================
-   ПРИОРИТЕТ ПРИ ПОЛНОСТЬЮ РАВНЫХ ВАРИАНТАХ
+   ПРИОРИТЕТ ПРИ РАВЕНСТВЕ
    ========================================================= */
 
 const TIE_BREAK_PRIORITY = [
@@ -790,6 +1171,17 @@ const TIE_BREAK_PRIORITY = [
 
 
 /* =========================================================
+   ПРАВИЛА ПРИГЛАШЁННОЙ ЗВЕЗДЫ
+   ========================================================= */
+
+const INVITED_STAR_TOTAL_PROCS = 19;
+
+const INVITED_STAR_MAX_PROC = 19;
+
+const INVITED_STAR_MAX_ZEROS = 1;
+
+
+/* =========================================================
    DOM
    ========================================================= */
 
@@ -797,6 +1189,14 @@ const procCells =
     [
         ...document.querySelectorAll(
             ".proc-cell"
+        )
+    ];
+
+
+const invitedStarCells =
+    [
+        ...document.querySelectorAll(
+            ".invited-star-cell"
         )
     ];
 
@@ -890,9 +1290,7 @@ function createTargetsPanel() {
             card.innerHTML = `
 
                 <div class="target-title">
-
                     ${STAT_NAMES[stat]}
-
                 </div>
 
                 <div class="target-input-row">
@@ -974,7 +1372,7 @@ function getTargets() {
 
 
 /* =========================================================
-   ПОЛУЧИТЬ ПРОКИ
+   ПОЛУЧИТЬ ОБЫЧНЫЕ ПРОКИ
    ========================================================= */
 
 function getProcs() {
@@ -1056,7 +1454,60 @@ function getProcs() {
 
 
 /* =========================================================
-   ВЫБРАННЫЕ СТАТЫ
+   ПОЛУЧИТЬ ПРОКИ ЗВЕЗДЫ
+   ========================================================= */
+
+function getInvitedStarProcs() {
+
+    return invitedStarCells.map(
+        cell => {
+
+            if (
+                cell.value.trim() === ""
+            ) {
+
+                return 0;
+
+            }
+
+
+            let value =
+                Number(
+                    cell.value
+                );
+
+
+            if (
+                !Number.isFinite(value)
+            ) {
+
+                return 0;
+
+            }
+
+
+            value =
+                Math.floor(
+                    value
+                );
+
+
+            return Math.max(
+                0,
+                Math.min(
+                    INVITED_STAR_MAX_PROC,
+                    value
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ВЫБРАННЫЕ ХАРАКТЕРИСТИКИ
    ========================================================= */
 
 function getEnabledStats() {
@@ -1075,7 +1526,7 @@ function getEnabledStats() {
 
 
 /* =========================================================
-   ПРОВЕРКА
+   ПРОВЕРКА ВСЕХ УСЛОВИЙ
    ========================================================= */
 
 function validate() {
@@ -1087,6 +1538,14 @@ function validate() {
     const procs =
         getProcs();
 
+
+    const invitedStarProcs =
+        getInvitedStarProcs();
+
+
+    /* =============================================
+       МИНИМУМ 3 ХАРАКТЕРИСТИКИ
+       ============================================= */
 
     if (
         stats.length < 3
@@ -1103,6 +1562,10 @@ function validate() {
 
     }
 
+
+    /* =============================================
+       ПРОВЕРКА 5 ОБЫЧНЫХ СЛОТОВ
+       ============================================= */
 
     for (
         let i = 0;
@@ -1136,6 +1599,71 @@ function validate() {
     }
 
 
+    /* =============================================
+       ПРОВЕРКА СУММЫ ЗВЕЗДЫ
+       ============================================= */
+
+    const invitedStarSum =
+        invitedStarProcs.reduce(
+            (
+                total,
+                value
+            ) =>
+                total + value,
+            0
+        );
+
+
+    if (
+        invitedStarSum !==
+        INVITED_STAR_TOTAL_PROCS
+    ) {
+
+        return {
+
+            valid: false,
+
+            error:
+                `В «Приглашённой звезде» сумма ` +
+                `проков должна быть 19. ` +
+                `Сейчас: ${invitedStarSum}.`
+
+        };
+
+    }
+
+
+    /* =============================================
+       ГЛАВНОЕ ИСПРАВЛЕНИЕ:
+       НЕ БОЛЕЕ ОДНОГО НУЛЯ
+       ============================================= */
+
+    const zeroCount =
+        invitedStarProcs.filter(
+            value =>
+                value === 0
+        ).length;
+
+
+    if (
+        zeroCount >
+        INVITED_STAR_MAX_ZEROS
+    ) {
+
+        return {
+
+            valid: false,
+
+            error:
+                `В «Приглашённой звезде» ` +
+                `может быть не больше одного ` +
+                `нулевого прокa. Сейчас: ${zeroCount}.`
+
+        };
+
+    }
+
+
     return {
 
         valid: true,
@@ -1148,7 +1676,7 @@ function validate() {
 
 
 /* =========================================================
-   ОБНОВИТЬ СУММЫ
+   ОБНОВИТЬ СУММЫ ОБЫЧНЫХ СЛОТОВ
    ========================================================= */
 
 function updateProcSums() {
@@ -1246,7 +1774,117 @@ function updateProcSums() {
 
 
 /* =========================================================
-   ЗНАЧЕНИЕ ПРОКА
+   ОБНОВИТЬ СУММУ ЗВЕЗДЫ
+   ========================================================= */
+
+function updateInvitedStarSum() {
+
+    const values =
+        getInvitedStarProcs();
+
+
+    const sum =
+        values.reduce(
+            (
+                total,
+                value
+            ) =>
+                total + value,
+            0
+        );
+
+
+    const zeroCount =
+        values.filter(
+            value =>
+                value === 0
+        ).length;
+
+
+    const box =
+        document.getElementById(
+            "invitedStarSum"
+        );
+
+
+    const span =
+        box.querySelector(
+            "span"
+        );
+
+
+    const zeroBox =
+        document.getElementById(
+            "invitedStarZero"
+        );
+
+
+    const zeroSpan =
+        zeroBox.querySelector(
+            "span"
+        );
+
+
+    span.textContent =
+        sum;
+
+
+    zeroSpan.textContent =
+        zeroCount;
+
+
+    box.classList.remove(
+        "ok",
+        "bad"
+    );
+
+
+    zeroBox.classList.remove(
+        "good",
+        "bad"
+    );
+
+
+    if (
+        sum ===
+        INVITED_STAR_TOTAL_PROCS
+    ) {
+
+        box.classList.add(
+            "ok"
+        );
+
+    } else {
+
+        box.classList.add(
+            "bad"
+        );
+
+    }
+
+
+    if (
+        zeroCount <=
+        INVITED_STAR_MAX_ZEROS
+    ) {
+
+        zeroBox.classList.add(
+            "good"
+        );
+
+    } else {
+
+        zeroBox.classList.add(
+            "bad"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ЗНАЧЕНИЕ ОБЫЧНОГО ПРОКА
    ========================================================= */
 
 function procValue(
@@ -1257,11 +1895,19 @@ function procValue(
     /*
         Атака:
 
-        0 -> 6
-        1 -> 9
+        0 проков = 6%
+        1 прок = 9%
+        2 прока = 12%
         ...
-        14 -> 48
+
+        Остальные:
+
+        0 проков = 3%
+        1 прок = 6%
+        2 прока = 9%
+        ...
     */
+
 
     if (
         stat === "attack"
@@ -1273,19 +1919,55 @@ function procValue(
     }
 
 
-    /*
-        Обычные статы:
-
-        0 -> 3
-        1 -> 6
-        ...
-        14 -> 45
-    */
-
     return 3 *
         (
             proc + 1
         );
+
+}
+
+
+/* =========================================================
+   ЗНАЧЕНИЕ ПРОКА ПРИГЛАШЁННОЙ ЗВЕЗДЫ
+   ========================================================= */
+
+function invitedStarProcValue(
+    stat,
+    proc
+) {
+
+    /*
+        АТАКА:
+
+        0 -> 4%
+        1 -> 6%
+        2 -> 8%
+        ...
+        19 -> 42%
+    */
+
+    if (
+        stat === "attack"
+    ) {
+
+        return 4 +
+            proc * 2;
+
+    }
+
+
+    /*
+        ОСТАЛЬНЫЕ ХАРАКТЕРИСТИКИ:
+
+        0 -> 2%
+        1 -> 4%
+        2 -> 6%
+        ...
+        19 -> 40%
+    */
+
+    return 2 +
+        proc * 2;
 
 }
 
@@ -1308,7 +1990,7 @@ function finalValue(
 
 
 /* =========================================================
-   АНАЛИЗ ОТНОСИТЕЛЬНО ЦЕЛИ
+   АНАЛИЗ ХАРАКТЕРИСТИКИ
    ========================================================= */
 
 function analyzeStat(
@@ -1352,7 +2034,7 @@ function analyzeStat(
 
 
 /* =========================================================
-   ГЕНЕРАЦИЯ НАЗНАЧЕНИЙ
+   ГЕНЕРАЦИЯ НАЗНАЧЕНИЙ ОБЫЧНОГО СЛОТА
    ========================================================= */
 
 function generateAssignments(
@@ -1465,7 +2147,182 @@ function generateAssignments(
 
 
 /* =========================================================
-   ADD ASSIGNMENT
+   ГЕНЕРАЦИЯ НАЗНАЧЕНИЙ ЗВЕЗДЫ
+   ========================================================= */
+
+function generateInvitedStarAssignments(
+    stats,
+    procValues
+) {
+
+    const result = [];
+
+
+    /* =============================================
+       СУММА ДОЛЖНА БЫТЬ 19
+       ============================================= */
+
+    const sum =
+        procValues[0] +
+        procValues[1] +
+        procValues[2];
+
+
+    if (
+        sum !==
+        INVITED_STAR_TOTAL_PROCS
+    ) {
+
+        return result;
+
+    }
+
+
+    /* =============================================
+       ПРОКИ 0–19
+       ============================================= */
+
+    if (
+        procValues.some(
+            value =>
+                value < 0 ||
+                value > INVITED_STAR_MAX_PROC
+        )
+    ) {
+
+        return result;
+
+    }
+
+
+    /* =============================================
+       НЕ БОЛЕЕ ОДНОГО НУЛЯ
+       ============================================= */
+
+    const zeroCount =
+        procValues.filter(
+            value =>
+                value === 0
+        ).length;
+
+
+    if (
+        zeroCount >
+        INVITED_STAR_MAX_ZEROS
+    ) {
+
+        return result;
+
+    }
+
+
+    /* =============================================
+       ТРИ РАЗНЫЕ ХАРАКТЕРИСТИКИ
+       ============================================= */
+
+    for (
+        let a = 0;
+        a < stats.length;
+        a++
+    ) {
+
+        for (
+            let b = 0;
+            b < stats.length;
+            b++
+        ) {
+
+            if (
+                b === a
+            ) {
+
+                continue;
+
+            }
+
+
+            for (
+                let c = 0;
+                c < stats.length;
+                c++
+            ) {
+
+                if (
+                    c === a ||
+                    c === b
+                ) {
+
+                    continue;
+
+                }
+
+
+                result.push([
+
+                    {
+
+                        stat:
+                            stats[a],
+
+                        proc:
+                            procValues[0],
+
+                        value:
+                            invitedStarProcValue(
+                                stats[a],
+                                procValues[0]
+                            )
+
+                    },
+
+                    {
+
+                        stat:
+                            stats[b],
+
+                        proc:
+                            procValues[1],
+
+                        value:
+                            invitedStarProcValue(
+                                stats[b],
+                                procValues[1]
+                            )
+
+                    },
+
+                    {
+
+                        stat:
+                            stats[c],
+
+                        proc:
+                            procValues[2],
+
+                        value:
+                            invitedStarProcValue(
+                                stats[c],
+                                procValues[2]
+                            )
+
+                    }
+
+                ]);
+
+            }
+
+        }
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================================
+   ДОБАВЛЕНИЕ НАЗНАЧЕНИЯ
    ========================================================= */
 
 function addAssignment(
@@ -1497,7 +2354,7 @@ function addAssignment(
 
 
 /* =========================================================
-   ОЦЕНКА ВАРИАНТА
+   СРАВНЕНИЕ РЕШЕНИЙ
    ========================================================= */
 
 function compareSolutions(
@@ -1586,6 +2443,10 @@ function compareSolutions(
     }
 
 
+    /* =============================================
+       СНАЧАЛА МИНИМАЛЬНАЯ ПОТЕРЯ
+       ============================================= */
+
     if (
         aDeficit !==
         bDeficit
@@ -1598,6 +2459,10 @@ function compareSolutions(
 
     }
 
+
+    /* =============================================
+       ПОТОМ МИНИМАЛЬНЫЙ ПЕРЕЛИВ
+       ============================================= */
 
     if (
         aOverflow !==
@@ -1612,6 +2477,10 @@ function compareSolutions(
     }
 
 
+    /* =============================================
+       ПОТОМ БЛИЗОСТЬ К ЦЕЛЯМ
+       ============================================= */
+
     if (
         aDistance !==
         bDistance
@@ -1624,6 +2493,10 @@ function compareSolutions(
 
     }
 
+
+    /* =============================================
+       ПОСЛЕДНИЙ ПРИОРИТЕТ
+       ============================================= */
 
     for (
         const stat
@@ -1664,7 +2537,7 @@ function compareSolutions(
 
 
 /* =========================================================
-   STATE KEY
+   КЛЮЧ СОСТОЯНИЯ
    ========================================================= */
 
 function makeKey(
@@ -1687,7 +2560,7 @@ function makeKey(
 
 
 /* =========================================================
-   COMPRESS STATES
+   СЖАТИЕ СОСТОЯНИЙ
    ========================================================= */
 
 function compressStates(
@@ -1743,7 +2616,7 @@ function compressStates(
 
 
 /* =========================================================
-   WORKER
+   СОЗДАНИЕ WORKER
    ========================================================= */
 
 function createWorker() {
@@ -1761,8 +2634,20 @@ const TIE_BREAK_PRIORITY =
 ${JSON.stringify(TIE_BREAK_PRIORITY)};
 
 
+const INVITED_STAR_TOTAL_PROCS =
+${INVITED_STAR_TOTAL_PROCS};
+
+
+const INVITED_STAR_MAX_PROC =
+${INVITED_STAR_MAX_PROC};
+
+
+const INVITED_STAR_MAX_ZEROS =
+${INVITED_STAR_MAX_ZEROS};
+
+
 /* =====================================================
-   PROC VALUE
+   ОБЫЧНЫЙ ПРОК
    ===================================================== */
 
 function procValue(
@@ -1789,7 +2674,32 @@ function procValue(
 
 
 /* =====================================================
-   FINAL VALUE
+   ПРОК ЗВЕЗДЫ
+   ===================================================== */
+
+function invitedStarProcValue(
+    stat,
+    proc
+) {
+
+    if (
+        stat === "attack"
+    ) {
+
+        return 4 +
+            proc * 2;
+
+    }
+
+
+    return 2 +
+        proc * 2;
+
+}
+
+
+/* =====================================================
+   ИТОГ
    ===================================================== */
 
 function finalValue(
@@ -1806,7 +2716,7 @@ function finalValue(
 
 
 /* =====================================================
-   ANALYZE
+   АНАЛИЗ
    ===================================================== */
 
 function analyzeStat(
@@ -1815,27 +2725,23 @@ function analyzeStat(
     targets
 ) {
 
-    const target =
-        targets[stat];
-
-
     return {
 
         deficit:
             Math.max(
                 0,
-                target - value
+                targets[stat] - value
             ),
 
         overflow:
             Math.max(
                 0,
-                value - target
+                value - targets[stat]
             ),
 
         distance:
             Math.abs(
-                value - target
+                value - targets[stat]
             )
 
     };
@@ -1844,7 +2750,7 @@ function analyzeStat(
 
 
 /* =====================================================
-   GENERATE ASSIGNMENTS
+   ОБЫЧНЫЕ НАЗНАЧЕНИЯ
    ===================================================== */
 
 function generateAssignments(
@@ -1957,7 +2863,182 @@ function generateAssignments(
 
 
 /* =====================================================
-   ADD
+   НАЗНАЧЕНИЯ ЗВЕЗДЫ
+   ===================================================== */
+
+function generateInvitedStarAssignments(
+    stats,
+    procValues
+) {
+
+    const result = [];
+
+
+    /* =============================================
+       СУММА
+       ============================================= */
+
+    const sum =
+        procValues[0] +
+        procValues[1] +
+        procValues[2];
+
+
+    if (
+        sum !==
+        INVITED_STAR_TOTAL_PROCS
+    ) {
+
+        return result;
+
+    }
+
+
+    /* =============================================
+       ДИАПАЗОН
+       ============================================= */
+
+    if (
+        procValues.some(
+            value =>
+                value < 0 ||
+                value > INVITED_STAR_MAX_PROC
+        )
+    ) {
+
+        return result;
+
+    }
+
+
+    /* =============================================
+       НЕ БОЛЕЕ ОДНОГО НУЛЯ
+       ============================================= */
+
+    const zeroCount =
+        procValues.filter(
+            value =>
+                value === 0
+        ).length;
+
+
+    if (
+        zeroCount >
+        INVITED_STAR_MAX_ZEROS
+    ) {
+
+        return result;
+
+    }
+
+
+    /* =============================================
+       ТРИ РАЗНЫЕ ХАРАКТЕРИСТИКИ
+       ============================================= */
+
+    for (
+        let a = 0;
+        a < stats.length;
+        a++
+    ) {
+
+        for (
+            let b = 0;
+            b < stats.length;
+            b++
+        ) {
+
+            if (
+                b === a
+            ) {
+
+                continue;
+
+            }
+
+
+            for (
+                let c = 0;
+                c < stats.length;
+                c++
+            ) {
+
+                if (
+                    c === a ||
+                    c === b
+                ) {
+
+                    continue;
+
+                }
+
+
+                result.push([
+
+                    {
+
+                        stat:
+                            stats[a],
+
+                        proc:
+                            procValues[0],
+
+                        value:
+                            invitedStarProcValue(
+                                stats[a],
+                                procValues[0]
+                            )
+
+                    },
+
+                    {
+
+                        stat:
+                            stats[b],
+
+                        proc:
+                            procValues[1],
+
+                        value:
+                            invitedStarProcValue(
+                                stats[b],
+                                procValues[1]
+                            )
+
+                    },
+
+                    {
+
+                        stat:
+                            stats[c],
+
+                        proc:
+                            procValues[2],
+
+                        value:
+                            invitedStarProcValue(
+                                stats[c],
+                                procValues[2]
+                            )
+
+                    }
+
+                ]);
+
+            }
+
+        }
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =====================================================
+   ДОБАВЛЕНИЕ
    ===================================================== */
 
 function addAssignment(
@@ -1989,7 +3070,7 @@ function addAssignment(
 
 
 /* =====================================================
-   COMPARE
+   СРАВНЕНИЕ
    ===================================================== */
 
 function better(
@@ -2235,7 +3316,7 @@ function compressStates(
 
 
 /* =====================================================
-   WORKER
+   РАСЧЁТ WORKER
    ===================================================== */
 
 self.onmessage =
@@ -2255,9 +3336,17 @@ function(event) {
             data.procs;
 
 
+        const invitedStarProcs =
+            data.invitedStarProcs;
+
+
         const targets =
             data.targets;
 
+
+        /* =============================================
+           ПЯТЬ ОБЫЧНЫХ СЛОТОВ
+           ============================================= */
 
         const assignments =
             procs.map(
@@ -2275,7 +3364,9 @@ function(event) {
 
                 totals: {},
 
-                slots: []
+                slots: [],
+
+                invitedStar: null
 
             }
 
@@ -2314,7 +3405,10 @@ function(event) {
                         slots:
                             state.slots.concat([
                                 assignment
-                            ])
+                            ]),
+
+                        invitedStar:
+                            state.invitedStar
 
                     });
 
@@ -2346,6 +3440,113 @@ function(event) {
 
         }
 
+
+        /* =============================================
+           ПРИГЛАШЁННАЯ ЗВЕЗДА
+           ============================================= */
+
+        const invitedAssignments =
+            generateInvitedStarAssignments(
+                stats,
+                invitedStarProcs
+            );
+
+
+        /*
+            ВАЖНО:
+
+            Если введено больше одного нулевого прокa,
+            список назначений будет пустым.
+
+            Поэтому звезда не может попасть
+            в итоговый расчёт с двумя или тремя нулями.
+        */
+
+        if (
+            invitedAssignments.length === 0
+        ) {
+
+            self.postMessage({
+
+                type:
+                    "error",
+
+                error:
+                    "Некорректные проки приглашённой звезды."
+
+            });
+
+            return;
+
+        }
+
+
+        /*
+            Звезда добавляется как ШЕСТОЙ этап
+            оптимизации, а не просто отображается.
+        */
+
+        const finalStates = [];
+
+
+        for (
+            const state of states
+        ) {
+
+            for (
+                const assignment
+                of invitedAssignments
+            ) {
+
+                const totals =
+                    addAssignment(
+                        state.totals,
+                        assignment
+                    );
+
+
+                finalStates.push({
+
+                    totals,
+
+                    slots:
+                        state.slots,
+
+                    invitedStar:
+                        assignment
+
+                });
+
+            }
+
+        }
+
+
+        states =
+            compressStates(
+                finalStates,
+                stats,
+                targets
+            );
+
+
+        self.postMessage({
+
+            type:
+                "progress",
+
+            slot:
+                "★",
+
+            states:
+                states.length
+
+        });
+
+
+        /* =============================================
+           ПОИСК ЛУЧШЕГО
+           ============================================= */
 
         let best =
             null;
@@ -2428,7 +3629,7 @@ function(event) {
 
 
 /* =========================================================
-   ФОРМАТ
+   ФОРМАТ ПРОЦЕНТА
    ========================================================= */
 
 function formatPercent(
@@ -2445,37 +3646,6 @@ function formatPercent(
 
 
     return `${value}%`;
-
-}
-
-
-/* =========================================================
-   КЛАСС
-   ========================================================= */
-
-function valueClass(
-    analysis
-) {
-
-    if (
-        analysis.deficit > 0
-    ) {
-
-        return "bad";
-
-    }
-
-
-    if (
-        analysis.overflow > 0
-    ) {
-
-        return "warning";
-
-    }
-
-
-    return "good";
 
 }
 
@@ -2563,6 +3733,10 @@ function showResult(
     `;
 
 
+    /* =============================================
+       ПЯТЬ ОБЫЧНЫХ СЛОТОВ
+       ============================================= */
+
     solution.slots.forEach(
         (
             slot,
@@ -2627,6 +3801,90 @@ function showResult(
         }
     );
 
+
+    /* =============================================
+       ПРИГЛАШЁННАЯ ЗВЕЗДА
+       ============================================= */
+
+    if (
+        solution.invitedStar
+    ) {
+
+        html += `
+
+            <div class="
+                result-slot
+                invited-star-result
+            ">
+
+                <h3>
+                    ★ Приглашённая звезда
+                </h3>
+
+                <div class="small">
+
+                    Сумма:
+                    19 / 19 проков.
+
+                    Максимум один нулевой прок.
+
+                </div>
+
+        `;
+
+
+        solution.invitedStar.forEach(
+            (
+                item,
+                cellIndex
+            ) => {
+
+                html += `
+
+                    <div class="result-stat">
+
+                        <span>
+
+                            Ячейка
+                            ${cellIndex + 1}:
+
+                            <strong>
+                                ${STAT_NAMES[item.stat]}
+                            </strong>
+
+                        </span>
+
+                        <span>
+
+                            ${item.proc}
+                            проков
+
+                            (${formatPercent(
+                                item.value
+                            )})
+
+                        </span>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+        html += `
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =============================================
+       ИТОГОВЫЕ ХАРАКТЕРИСТИКИ
+       ============================================= */
 
     html += `
 
@@ -2715,7 +3973,7 @@ function showResult(
 
                     <div class="small">
 
-                        Проки:
+                        Вклад проков:
                         ${formatPercent(
                             procTotal
                         )}
@@ -2745,6 +4003,10 @@ function showResult(
         </div>
     `;
 
+
+    /* =============================================
+       ТАБЛИЦА ПОТЕРЬ
+       ============================================= */
 
     html += `
 
@@ -2890,6 +4152,10 @@ function showResult(
     `;
 
 
+    /* =============================================
+       ОБЩИЙ ИТОГ
+       ============================================= */
+
     html += `
 
         <div class="unused">
@@ -2958,7 +4224,7 @@ function showResult(
             <div class="result-stat">
 
                 <span>
-                    Проков использовано
+                    Обычные проки
                 </span>
 
                 <strong>
@@ -2968,21 +4234,43 @@ function showResult(
             </div>
 
 
+            <div class="result-stat">
+
+                <span>
+                    Проки приглашённой звезды
+                </span>
+
+                <strong>
+                    19 / 19
+                </strong>
+
+            </div>
+
+
+            <div class="result-stat">
+
+                <span>
+                    Всего проков
+                </span>
+
+                <strong>
+                    89 / 89
+                </strong>
+
+            </div>
+
+
             <p class="small">
 
-                Калькулятор не требует точного
-                попадания в заданные цели.
+                В расчёте участвуют пять обычных
+                слотов по 14 проков и отдельная
+                приглашённая звезда с 19 проками.
 
-                Сначала он старается свести
-                суммарные потери к минимуму.
+                У звезды три разные характеристики.
 
-                Поэтому если цель, например,
-                50%, результат 52% считается
-                без потери статы, но с переливом
-                +2%.
-
-                Если получить только 48%,
-                будет показана потеря 2%.
+                Сумма трёх ячеек звезды должна быть
+                ровно 19, а нулевой прок допускается
+                максимум в одной ячейке.
 
             </p>
 
@@ -3011,6 +4299,10 @@ function updateUsage() {
         getProcs();
 
 
+    const invitedStarProcs =
+        getInvitedStarProcs();
+
+
     let total =
         0;
 
@@ -3027,6 +4319,24 @@ function updateUsage() {
     );
 
 
+    const invitedStarTotal =
+        invitedStarProcs.reduce(
+            (
+                total,
+                value
+            ) =>
+                total + value,
+            0
+        );
+
+
+    const invitedStarZeros =
+        invitedStarProcs.filter(
+            value =>
+                value === 0
+        ).length;
+
+
     usage.innerHTML = `
 
         <div class="summary-grid">
@@ -3037,7 +4347,7 @@ function updateUsage() {
                     Общий проковый пул
                 </strong>
 
-                70
+                89
 
             </div>
 
@@ -3045,10 +4355,44 @@ function updateUsage() {
             <div class="summary-card">
 
                 <strong>
-                    Введено проков
+                    Обычные проки
                 </strong>
 
-                ${total}
+                ${total} / 70
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <strong>
+                    Приглашённая звезда
+                </strong>
+
+                ${invitedStarTotal} / 19
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <strong>
+                    Нулевые проки звезды
+                </strong>
+
+                <span
+                    class="
+                        ${
+                            invitedStarZeros <= 1
+                                ? "good"
+                                : "bad"
+                        }
+                    "
+                >
+
+                    ${invitedStarZeros} / 1
+
+                </span>
 
             </div>
 
@@ -3068,10 +4412,16 @@ function updateUsage() {
 
         <p class="small">
 
-            Каждый из пяти слотов должен
-            содержать ровно 14 проков.
+            Пять обычных слотов используют
+            70 проков.
 
-            Всего используется 70 проков.
+            Приглашённая звезда использует
+            ещё 19 проков.
+
+            Общий пул — 89 проков.
+
+            В звезде может быть максимум
+            один нулевой прок.
 
         </p>
 
@@ -3081,7 +4431,7 @@ function updateUsage() {
 
 
 /* =========================================================
-   ОБНОВИТЬ ЦЕЛИ
+   ОБНОВИТЬ ПАНЕЛЬ ЦЕЛЕЙ
    ========================================================= */
 
 function refreshTargetsPanel() {
@@ -3177,6 +4527,10 @@ function startCalculation() {
         getProcs();
 
 
+    const invitedStarProcs =
+        getInvitedStarProcs();
+
+
     const targets =
         getTargets();
 
@@ -3200,23 +4554,48 @@ function startCalculation() {
                 event.data;
 
 
+            /* =====================================
+               ПРОГРЕСС
+               ===================================== */
+
             if (
                 data.type ===
                 "progress"
             ) {
 
-                progress.textContent =
-                    `Обработан слот ` +
-                    `${data.slot}/5. ` +
-                    `Состояний: ` +
-                    `${data.states.toLocaleString(
-                        "ru-RU"
-                    )}`;
+                if (
+                    data.slot ===
+                    "★"
+                ) {
+
+                    progress.textContent =
+                        `Обработана приглашённая звезда. ` +
+                        `Состояний: ` +
+                        `${data.states.toLocaleString(
+                            "ru-RU"
+                        )}`;
+
+                } else {
+
+                    progress.textContent =
+                        `Обработан слот ` +
+                        `${data.slot}/5. ` +
+                        `Состояний: ` +
+                        `${data.states.toLocaleString(
+                            "ru-RU"
+                        )}`;
+
+                }
+
 
                 return;
 
             }
 
+
+            /* =====================================
+               ОШИБКА
+               ===================================== */
 
             if (
                 data.type ===
@@ -3242,6 +4621,10 @@ function startCalculation() {
 
             }
 
+
+            /* =====================================
+               ГОТОВО
+               ===================================== */
 
             if (
                 data.type ===
@@ -3317,6 +4700,8 @@ function startCalculation() {
 
         procs,
 
+        invitedStarProcs,
+
         targets
 
     });
@@ -3325,7 +4710,7 @@ function startCalculation() {
 
 
 /* =========================================================
-   СОБЫТИЯ ПРОКОВ
+   СОБЫТИЯ ОБЫЧНЫХ ПРОКОВ
    ========================================================= */
 
 procCells.forEach(
@@ -3377,6 +4762,9 @@ procCells.forEach(
 
                 updateUsage();
 
+                result.style.display =
+                    "none";
+
             }
         );
 
@@ -3385,7 +4773,70 @@ procCells.forEach(
 
 
 /* =========================================================
-   СОБЫТИЯ СТАТОВ
+   СОБЫТИЯ ЗВЕЗДЫ
+   ========================================================= */
+
+invitedStarCells.forEach(
+    cell => {
+
+        cell.addEventListener(
+            "input",
+            function() {
+
+                if (
+                    cell.value !== ""
+                ) {
+
+                    let value =
+                        Number(
+                            cell.value
+                        );
+
+
+                    if (
+                        Number.isFinite(value)
+                    ) {
+
+                        value =
+                            Math.floor(
+                                value
+                            );
+
+
+                        value =
+                            Math.max(
+                                0,
+                                Math.min(
+                                    INVITED_STAR_MAX_PROC,
+                                    value
+                                )
+                            );
+
+
+                        cell.value =
+                            value;
+
+                    }
+
+                }
+
+
+                updateInvitedStarSum();
+
+                updateUsage();
+
+                result.style.display =
+                    "none";
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   СОБЫТИЯ ХАРАКТЕРИСТИК
    ========================================================= */
 
 statChecks.forEach(
@@ -3398,6 +4849,9 @@ statChecks.forEach(
                 refreshTargetsPanel();
 
                 updateUsage();
+
+                result.style.display =
+                    "none";
 
             }
         );
@@ -3440,12 +4894,14 @@ calculateButton.addEventListener(
 
 
 /* =========================================================
-   СТАРТ
+   ПЕРВОНАЧАЛЬНЫЙ ЗАПУСК
    ========================================================= */
 
 createTargetsPanel();
 
 updateProcSums();
+
+updateInvitedStarSum();
 
 updateUsage();
 
@@ -3454,3 +4910,4 @@ updateUsage();
 </body>
 
 </html>
+    
