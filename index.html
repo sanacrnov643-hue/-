@@ -3,711 +3,1949 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Калькулятор характеристик</title>
+
+<title>Оптимизатор характеристик</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
 
-    body {
-        margin: 0;
-        padding: 20px;
-        background: #111318;
-        color: #f1f1f1;
-        font-family: Arial, sans-serif;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    h1 {
-        text-align: center;
-        margin-bottom: 25px;
-    }
+body {
+    margin: 0;
+    padding: 16px;
+    background: #111318;
+    color: #f2f2f2;
+    font-family: Arial, sans-serif;
+}
 
-    h2 {
-        margin-top: 0;
-    }
+h1 {
+    text-align: center;
+    margin: 5px 0 25px;
+}
 
-    .panel {
-        max-width: 900px;
-        margin: 0 auto 20px;
-        padding: 20px;
-        background: #1b1e25;
-        border-radius: 14px;
-    }
+h2 {
+    margin-top: 0;
+}
 
-    .stats-select {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 10px;
-    }
+.panel {
+    max-width: 1000px;
+    margin: 0 auto 18px;
+    padding: 18px;
+    background: #1b1e25;
+    border-radius: 14px;
+}
 
-    label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px;
-        background: #252933;
-        border-radius: 8px;
-        cursor: pointer;
-    }
+.note {
+    color: #aaa;
+    font-size: 14px;
+    line-height: 1.5;
+}
 
-    input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-    }
+/* =========================
+   ХАРАКТЕРИСТИКИ
+========================= */
 
-    button {
-        width: 100%;
-        padding: 14px;
-        margin-top: 18px;
-        border: 0;
-        border-radius: 10px;
-        background: #7c5cff;
-        color: white;
-        font-size: 17px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+.stats-select {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+}
 
-    button:hover {
-        background: #9278ff;
-    }
+.check {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px;
+    background: #252933;
+    border-radius: 8px;
+    cursor: pointer;
+}
 
-    .slots {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
-    }
+.check input {
+    width: 18px;
+    height: 18px;
+}
 
-    .slot {
-        background: #252933;
-        border-radius: 12px;
-        padding: 15px;
-    }
 
-    .slot h3 {
-        margin-top: 0;
-        text-align: center;
-    }
+/* =========================
+   5 КОЛОНОК ПРОКОВ
+========================= */
 
-    .stat-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 9px 0;
-        border-bottom: 1px solid #393d47;
-    }
+.procs-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
 
-    .stat-row:last-child {
-        border-bottom: none;
-    }
+.procs-grid {
+    min-width: 600px;
 
-    .summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-        gap: 10px;
-    }
+    display: grid;
+    grid-template-columns:
+        repeat(5, 1fr);
 
-    .summary-item {
-        background: #252933;
-        padding: 13px;
-        border-radius: 9px;
-    }
+    gap: 10px;
+}
 
-    .summary-item strong {
-        display: block;
-        margin-bottom: 5px;
-    }
+.slot-column {
+    background: #252933;
+    border-radius: 10px;
+    padding: 10px;
+}
 
-    .remaining {
-        border: 1px solid #7c5cff;
-    }
+.slot-title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
 
-    .error {
-        color: #ff7777;
-        line-height: 1.5;
-    }
+.proc-cell {
+    width: 100%;
+    height: 52px;
 
-    .note {
-        color: #aaa;
-        font-size: 14px;
-        line-height: 1.5;
-    }
+    margin-bottom: 9px;
+
+    border: 1px solid #555;
+    border-radius: 8px;
+
+    background: #15171c;
+    color: white;
+
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.proc-cell:focus {
+    outline: none;
+    border-color: #8b72ff;
+}
+
+.slot-total {
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.valid {
+    color: #71e58a;
+}
+
+.invalid {
+    color: #ff7272;
+}
+
+
+/* =========================
+   КНОПКА
+========================= */
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 18px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: #7c5cff;
+    color: white;
+
+    font-size: 17px;
+    font-weight: bold;
+}
+
+button:active {
+    transform: scale(.99);
+}
+
+
+/* =========================
+   РЕЗУЛЬТАТ
+========================= */
+
+.summary {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(160px, 1fr));
+
+    gap: 10px;
+}
+
+.summary-item {
+    background: #252933;
+    padding: 13px;
+    border-radius: 9px;
+}
+
+.summary-item strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+
+/* =========================
+   РЕЗУЛЬТАТ СЛОТОВ
+========================= */
+
+.slot-result {
+    margin-bottom: 12px;
+    padding: 14px;
+
+    background: #252933;
+    border-radius: 10px;
+}
+
+.slot-result h3 {
+    margin-top: 0;
+}
+
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 8px 0;
+
+    border-bottom:
+        1px solid #393d47;
+}
+
+.stat-line:last-child {
+    border-bottom: 0;
+}
+
+.proc-result {
+    color: #aaa;
+}
+
+
+/* =========================
+   ОШИБКИ / ЗАГРУЗКА
+========================= */
+
+.error {
+    color: #ff7272;
+    line-height: 1.5;
+}
+
+.loading {
+    text-align: center;
+    padding: 22px;
+    color: #aaa;
+}
+
+.hidden {
+    display: none;
+}
+
 </style>
 </head>
 
+
 <body>
 
-<h1>Калькулятор характеристик</h1>
+
+<h1>Оптимизатор характеристик</h1>
+
+
+<!-- =====================================================
+     ХАРАКТЕРИСТИКИ
+===================================================== -->
 
 <div class="panel">
-    <h2>Доступные характеристики</h2>
+
+    <h2>Характеристики</h2>
+
+    <p class="note">
+        Выбери характеристики, которые калькулятор может использовать.
+        Не выбранные характеристики не будут попадать в результат.
+    </p>
+
 
     <div class="stats-select">
-        <label>
-            <input type="checkbox" value="crit" checked>
+
+        <label class="check">
+            <input
+                type="checkbox"
+                value="crit"
+                checked
+            >
             Шанс крита
         </label>
 
-        <label>
-            <input type="checkbox" value="penetration" checked>
+
+        <label class="check">
+            <input
+                type="checkbox"
+                value="penetration"
+                checked
+            >
             Проницание
         </label>
 
-        <label>
-            <input type="checkbox" value="accuracy" checked>
+
+        <label class="check">
+            <input
+                type="checkbox"
+                value="accuracy"
+                checked
+            >
             Точность
         </label>
 
-        <label>
-            <input type="checkbox" value="critDamage" checked>
+
+        <label class="check">
+            <input
+                type="checkbox"
+                value="critDamage"
+                checked
+            >
             Урон крита
         </label>
 
-        <label>
-            <input type="checkbox" value="attack" checked>
+
+        <label class="check">
+            <input
+                type="checkbox"
+                value="attack"
+                checked
+            >
             Атака
         </label>
 
-        <label>
-            <input type="checkbox" value="meter">
+
+        <label class="check">
+            <input
+                type="checkbox"
+                value="meter"
+            >
             Прирост шкалы
         </label>
 
-        <label>
-            <input type="checkbox" value="cooldown">
+
+        <label class="check">
+            <input
+                type="checkbox"
+                value="cooldown"
+            >
             Перезарядка приёмов
         </label>
+
     </div>
 
-    <button onclick="calculate()">Найти оптимальную комбинацию</button>
+</div>
+
+
+
+<!-- =====================================================
+     ПРОКИ
+===================================================== -->
+
+<div class="panel">
+
+    <h2>Проки</h2>
 
     <p class="note">
-        Каждый слот содержит 3 разные характеристики и ровно 14 проков.
-        Одна и та же характеристика может находиться в разных слотах.
+        Введи проки вручную. Каждый вертикальный столбец —
+        отдельный слот. В каждом слоте должно быть ровно
+        14 проков.
     </p>
+
+
+    <div class="procs-wrapper">
+
+        <div class="procs-grid">
+
+
+            <!-- СЛОТ 1 -->
+
+            <div class="slot-column">
+
+                <div class="slot-title">
+                    Слот 1
+                </div>
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="0"
+                    data-position="0"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="0"
+                    data-position="1"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="0"
+                    data-position="2"
+                >
+
+                <div
+                    class="slot-total invalid"
+                    id="total-0"
+                >
+                    0 / 14
+                </div>
+
+            </div>
+
+
+            <!-- СЛОТ 2 -->
+
+            <div class="slot-column">
+
+                <div class="slot-title">
+                    Слот 2
+                </div>
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="1"
+                    data-position="0"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="1"
+                    data-position="1"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="1"
+                    data-position="2"
+                >
+
+                <div
+                    class="slot-total invalid"
+                    id="total-1"
+                >
+                    0 / 14
+                </div>
+
+            </div>
+
+
+            <!-- СЛОТ 3 -->
+
+            <div class="slot-column">
+
+                <div class="slot-title">
+                    Слот 3
+                </div>
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="2"
+                    data-position="0"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="2"
+                    data-position="1"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="2"
+                    data-position="2"
+                >
+
+                <div
+                    class="slot-total invalid"
+                    id="total-2"
+                >
+                    0 / 14
+                </div>
+
+            </div>
+
+
+            <!-- СЛОТ 4 -->
+
+            <div class="slot-column">
+
+                <div class="slot-title">
+                    Слот 4
+                </div>
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="3"
+                    data-position="0"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="3"
+                    data-position="1"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="3"
+                    data-position="2"
+                >
+
+                <div
+                    class="slot-total invalid"
+                    id="total-3"
+                >
+                    0 / 14
+                </div>
+
+            </div>
+
+
+            <!-- СЛОТ 5 -->
+
+            <div class="slot-column">
+
+                <div class="slot-title">
+                    Слот 5
+                </div>
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="4"
+                    data-position="0"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="4"
+                    data-position="1"
+                >
+
+                <input
+                    class="proc-cell"
+                    type="number"
+                    min="0"
+                    max="14"
+                    value=""
+                    placeholder="Прок"
+                    data-slot="4"
+                    data-position="2"
+                >
+
+                <div
+                    class="slot-total invalid"
+                    id="total-4"
+                >
+                    0 / 14
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <button id="calculateButton">
+        Рассчитать оптимальную комбинацию
+    </button>
+
 </div>
 
-<div id="error" class="panel" style="display:none;"></div>
 
-<div id="result" style="display:none;">
+
+<!-- =====================================================
+     ОШИБКА
+===================================================== -->
+
+<div
+    id="error"
+    class="panel hidden"
+></div>
+
+
+
+<!-- =====================================================
+     ЗАГРУЗКА
+===================================================== -->
+
+<div
+    id="loading"
+    class="panel loading hidden"
+>
+    Ищу оптимальную комбинацию...
+</div>
+
+
+
+<!-- =====================================================
+     РЕЗУЛЬТАТ
+===================================================== -->
+
+<div id="result" class="hidden">
+
+
+    <!-- ИТОГ -->
 
     <div class="panel">
-        <h2>Итоговые характеристики</h2>
-        <div id="summary" class="summary"></div>
+
+        <h2>
+            Итоговые характеристики
+        </h2>
+
+        <div
+            id="summary"
+            class="summary"
+        ></div>
+
     </div>
 
-    <div class="panel">
-        <h2>Остаток характеристики</h2>
-        <div id="remaining" class="summary"></div>
-    </div>
+
+    <!-- ОСТАТОК -->
 
     <div class="panel">
-        <h2>Оптимальная комбинация</h2>
-        <div id="slots" class="slots"></div>
+
+        <h2>
+            Остаток характеристики
+        </h2>
+
+        <div
+            id="remaining"
+            class="summary"
+        ></div>
+
     </div>
+
+
+    <!-- СЛОТЫ -->
+
+    <div class="panel">
+
+        <h2>
+            Распределение по слотам
+        </h2>
+
+        <div
+            id="slotResults"
+        ></div>
+
+    </div>
+
 
 </div>
+
+
 
 <script>
 
+/* =====================================================
+   НАЗВАНИЯ
+===================================================== */
+
 const STAT_NAMES = {
-    crit: "Шанс крита",
-    penetration: "Проницание",
-    accuracy: "Точность",
-    critDamage: "Урон крита",
-    attack: "Атака",
-    meter: "Прирост шкалы",
-    cooldown: "Перезарядка приёмов"
+
+    crit:
+        "Шанс крита",
+
+    penetration:
+        "Проницание",
+
+    accuracy:
+        "Точность",
+
+    critDamage:
+        "Урон крита",
+
+    attack:
+        "Атака",
+
+    meter:
+        "Прирост шкалы",
+
+    cooldown:
+        "Перезарядка приёмов"
+
 };
+
+
+/* =====================================================
+   ЦЕЛЕВЫЕ ДИАПАЗОНЫ
+===================================================== */
 
 const RANGES = {
+
     crit: [70, 90],
+
     penetration: [45, 55],
+
     accuracy: [30, 55],
+
     critDamage: [95, 120]
+
 };
+
+
+/* =====================================================
+   ЦЕНТР ДИАПАЗОНА
+===================================================== */
 
 const MIDPOINTS = {
+
     crit: 80,
+
     penetration: 50,
+
     accuracy: 42.5,
+
     critDamage: 107.5
+
 };
 
 
-// ---------------------------------------------------------
-// Получение доступных характеристик
-// ---------------------------------------------------------
+/* =====================================================
+   ОБНОВЛЕНИЕ СУММЫ ПРОКОВ
+===================================================== */
+
+function updateSlotTotal(slot) {
+
+    const inputs =
+        document.querySelectorAll(
+            `.proc-cell[data-slot="${slot}"]`
+        );
+
+
+    let total = 0;
+
+
+    inputs.forEach(input => {
+
+        let value =
+            parseInt(input.value);
+
+        if (isNaN(value)) {
+            value = 0;
+        }
+
+        if (value < 0) {
+            input.value = 0;
+            value = 0;
+        }
+
+        if (value > 14) {
+            input.value = 14;
+            value = 14;
+        }
+
+        total += value;
+
+    });
+
+
+    const element =
+        document.getElementById(
+            `total-${slot}`
+        );
+
+
+    element.textContent =
+        `${total} / 14`;
+
+
+    if (total === 14) {
+
+        element.className =
+            "slot-total valid";
+
+    } else {
+
+        element.className =
+            "slot-total invalid";
+
+    }
+
+}
+
+
+/* =====================================================
+   ОБРАБОТКА ПОЛЕЙ ПРОКОВ
+===================================================== */
+
+document
+    .querySelectorAll(".proc-cell")
+    .forEach(input => {
+
+        input.addEventListener(
+            "input",
+            () => {
+
+                updateSlotTotal(
+                    Number(input.dataset.slot)
+                );
+
+            }
+        );
+
+    });
+
+
+/* =====================================================
+   ПОЛУЧИТЬ ХАРАКТЕРИСТИКИ
+===================================================== */
 
 function getEnabledStats() {
-    return [...document.querySelectorAll(
-        '.stats-select input[type="checkbox"]:checked'
-    )].map(x => x.value);
+
+    return [
+        ...document.querySelectorAll(
+            '.stats-select input:checked'
+        )
+    ].map(
+        input => input.value
+    );
+
 }
 
 
-// ---------------------------------------------------------
-// Все варианты распределения 14 проков между 3 статами
-// ---------------------------------------------------------
+/* =====================================================
+   ПОЛУЧИТЬ ПРОКИ
+===================================================== */
 
-function generateProcSplits() {
-    const result = [];
+function getProcs() {
 
-    for (let a = 0; a <= 14; a++) {
-        for (let b = 0; b <= 14 - a; b++) {
-            const c = 14 - a - b;
-
-            result.push([a, b, c]);
-        }
-    }
-
-    return result;
-}
-
-const PROC_SPLITS = generateProcSplits();
+    const slots = [];
 
 
-// ---------------------------------------------------------
-// Комбинации трёх разных характеристик
-// ---------------------------------------------------------
+    for (let slot = 0; slot < 5; slot++) {
 
-function generateCombinations(array, size) {
-    const result = [];
-
-    function recursive(start, current) {
-        if (current.length === size) {
-            result.push([...current]);
-            return;
-        }
-
-        for (let i = start; i < array.length; i++) {
-            current.push(array[i]);
-            recursive(i + 1, current);
-            current.pop();
-        }
-    }
-
-    recursive(0, []);
-
-    return result;
-}
+        const inputs =
+            document.querySelectorAll(
+                `.proc-cell[data-slot="${slot}"]`
+            );
 
 
-// ---------------------------------------------------------
-// Создание всех возможных вариантов одного слота
-// ---------------------------------------------------------
+        const values = [];
 
-function generateSlotOptions(enabledStats) {
 
-    const combinations = generateCombinations(enabledStats, 3);
-    const options = [];
+        inputs.forEach(input => {
 
-    for (const stats of combinations) {
-
-        for (const split of PROC_SPLITS) {
-
-            const values = {};
-
-            for (let i = 0; i < 3; i++) {
-                values[stats[i]] = split[i];
+            if (
+                input.value === ""
+            ) {
+                values.push(null);
+                return;
             }
 
-            options.push({
-                stats: [...stats],
-                procs: [...split],
-                values
-            });
-        }
+
+            values.push(
+                Number(input.value)
+            );
+
+        });
+
+
+        slots.push(values);
+
     }
 
-    return options;
+
+    return slots;
+
 }
 
 
-// ---------------------------------------------------------
-// Расчёт процентов
-// ---------------------------------------------------------
+/* =====================================================
+   ПРОВЕРКА ПРОКОВ
+===================================================== */
 
-function calculateTotals(chosenSlots, enabledStats) {
+function validateProcs(slots) {
 
-    const occurrences = {};
-    const procs = {};
+    for (
+        let i = 0;
+        i < slots.length;
+        i++
+    ) {
 
-    for (const stat of enabledStats) {
-        occurrences[stat] = 0;
-        procs[stat] = 0;
-    }
+        const slot =
+            slots[i];
 
-    for (const slot of chosenSlots) {
 
-        for (let i = 0; i < slot.stats.length; i++) {
+        if (
+            slot.some(
+                value =>
+                    value === null ||
+                    !Number.isInteger(value)
+            )
+        ) {
 
-            const stat = slot.stats[i];
+            return `Слот ${i + 1}: заполни все 3 ячейки.`;
 
-            occurrences[stat]++;
-            procs[stat] += slot.procs[i];
         }
+
+
+        const total =
+            slot.reduce(
+                (a, b) => a + b,
+                0
+            );
+
+
+        if (total !== 14) {
+
+            return (
+                `Слот ${i + 1}: ` +
+                `сейчас ${total} проков, ` +
+                `а должно быть 14.`
+            );
+
+        }
+
+
+        for (const value of slot) {
+
+            if (
+                value < 0 ||
+                value > 14
+            ) {
+
+                return (
+                    `Слот ${i + 1}: ` +
+                    `прок должен быть от 0 до 14.`
+                );
+
+            }
+
+        }
+
     }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   ВСЕ ВОЗМОЖНЫЕ НАЗНАЧЕНИЯ
+===================================================== */
+
+function createOptions(
+    procs,
+    stats
+) {
+
+    const options = [];
+
+
+    /*
+       Для каждого слота нужно выбрать
+       3 РАЗНЫЕ характеристики.
+    */
+
+    for (
+        let a = 0;
+        a < stats.length;
+        a++
+    ) {
+
+        for (
+            let b = 0;
+            b < stats.length;
+            b++
+        ) {
+
+            if (b === a) {
+                continue;
+            }
+
+
+            for (
+                let c = 0;
+                c < stats.length;
+                c++
+            ) {
+
+                if (
+                    c === a ||
+                    c === b
+                ) {
+                    continue;
+                }
+
+
+                options.push({
+
+                    stats: [
+                        stats[a],
+                        stats[b],
+                        stats[c]
+                    ],
+
+                    procs: [
+                        procs[0],
+                        procs[1],
+                        procs[2]
+                    ]
+
+                });
+
+            }
+
+        }
+
+    }
+
+
+    return options;
+
+}
+
+
+/* =====================================================
+   ПОДСЧЁТ ХАРАКТЕРИСТИК
+===================================================== */
+
+function calculateTotals(
+    selectedSlots,
+    enabledStats
+) {
 
     const totals = {};
 
-    for (const stat of enabledStats) {
 
-        const units =
-            (occurrences[stat] || 0) +
-            (procs[stat] || 0);
+    enabledStats.forEach(
+        stat => {
+            totals[stat] = 0;
+        }
+    );
 
-        let value = units * 3;
 
-        if (stat === "cooldown") {
-            value = -value;
+    for (
+        const slot of selectedSlots
+    ) {
+
+        for (
+            let i = 0;
+            i < 3;
+            i++
+        ) {
+
+            const stat =
+                slot.stats[i];
+
+            const proc =
+                slot.procs[i];
+
+
+            /*
+               0 проков = 3%
+               1 прок = 6%
+               2 прока = 9%
+               ...
+               
+               Формула:
+               (проки + 1) × 3
+            */
+
+            let value =
+                (proc + 1) * 3;
+
+
+            /*
+               Перезарядка отрицательная.
+            */
+
+            if (
+                stat === "cooldown"
+            ) {
+
+                value = -value;
+
+            }
+
+
+            totals[stat] += value;
+
         }
 
-        totals[stat] = value;
     }
 
-    // Базовые 20% крита персонажа
-    if (enabledStats.includes("crit")) {
-        totals.crit += 20;
-    }
-
-    return totals;
-}
-
-
-// ---------------------------------------------------------
-// Насколько комбинация соответствует оптимальным диапазонам
-// ---------------------------------------------------------
-
-function calculateScore(totals, enabledStats) {
-
-    let score = 0;
-
-    const coreStats = [
-        "crit",
-        "penetration",
-        "accuracy",
-        "critDamage"
-    ];
-
-    for (const stat of coreStats) {
-
-        if (!enabledStats.includes(stat)) {
-            continue;
-        }
-
-        const value = totals[stat] || 0;
-        const range = RANGES[stat];
-
-        // Сначала сильно штрафуем выход за допустимый диапазон
-        if (value < range[0]) {
-            score += 100000 + (range[0] - value) * 1000;
-        }
-
-        if (value > range[1]) {
-            score += 100000 + (value - range[1]) * 1000;
-        }
-
-        // Затем стремимся к середине диапазона
-        score += Math.pow(value - MIDPOINTS[stat], 2);
-    }
-
-    // При равных условиях предпочитаем больше атаки
-    if (enabledStats.includes("attack")) {
-        score -= (totals.attack || 0) * 0.01;
-    }
-
-    return score;
-}
-
-
-// ---------------------------------------------------------
-// Дополнительная проверка
-// ---------------------------------------------------------
-
-function isValid(totals, enabledStats) {
-
-    for (const stat of [
-        "crit",
-        "penetration",
-        "accuracy",
-        "critDamage"
-    ]) {
-
-        if (!enabledStats.includes(stat)) {
-            continue;
-        }
-
-        const [min, max] = RANGES[stat];
-        const value = totals[stat] || 0;
-
-        if (value < min || value > max) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-// ---------------------------------------------------------
-// Оптимизатор
-// ---------------------------------------------------------
-
-function findBestCombination(enabledStats) {
-
-    if (enabledStats.length < 3) {
-        return null;
-    }
-
-    const slotOptions = generateSlotOptions(enabledStats);
-
-    let best = null;
-    let bestScore = Infinity;
 
     /*
-       Используем beam search.
-
-       Вместо перебора абсолютно всех комбинаций
-       5 слотов (что было бы слишком много),
-       сохраняем наиболее перспективные состояния.
+       У персонажа есть базовые 20%
+       критического шанса.
     */
 
-    let states = [{
-        slots: [],
-        totals: {}
-    }];
+    if (
+        enabledStats.includes("crit")
+    ) {
 
-    const BEAM_SIZE = 5000;
+        totals.crit += 20;
 
-    for (let slotIndex = 0; slotIndex < 5; slotIndex++) {
+    }
+
+
+    return totals;
+
+}
+
+
+/* =====================================================
+   ПРОВЕРКА ДИАПАЗОНОВ
+===================================================== */
+
+function isValid(
+    totals,
+    enabledStats
+) {
+
+    for (
+        const stat of [
+            "crit",
+            "penetration",
+            "accuracy",
+            "critDamage"
+        ]
+    ) {
+
+        if (
+            !enabledStats.includes(stat)
+        ) {
+            continue;
+        }
+
+
+        const value =
+            totals[stat] || 0;
+
+
+        const range =
+            RANGES[stat];
+
+
+        if (
+            value < range[0] ||
+            value > range[1]
+        ) {
+
+            return false;
+
+        }
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =====================================================
+   ОЦЕНКА КОМБИНАЦИИ
+===================================================== */
+
+function score(
+    totals,
+    enabledStats
+) {
+
+    let result = 0;
+
+
+    /*
+       Чем ближе к центру диапазона,
+       тем меньше score.
+    */
+
+    for (
+        const stat of [
+            "crit",
+            "penetration",
+            "accuracy",
+            "critDamage"
+        ]
+    ) {
+
+        if (
+            !enabledStats.includes(stat)
+        ) {
+            continue;
+        }
+
+
+        const value =
+            totals[stat] || 0;
+
+
+        const range =
+            RANGES[stat];
+
+
+        const midpoint =
+            MIDPOINTS[stat];
+
+
+        /*
+           Сильный штраф за выход
+           за диапазон.
+        */
+
+        if (
+            value < range[0]
+        ) {
+
+            result +=
+                100000 +
+                (
+                    range[0] - value
+                ) * 10000;
+
+        }
+
+
+        if (
+            value > range[1]
+        ) {
+
+            result +=
+                100000 +
+                (
+                    value - range[1]
+                ) * 10000;
+
+        }
+
+
+        result +=
+            Math.pow(
+                value - midpoint,
+                2
+            );
+
+    }
+
+
+    /*
+       Если варианты одинаково близки
+       к целям — предпочтение отдаётся
+       большей атаке.
+    */
+
+    if (
+        enabledStats.includes("attack")
+    ) {
+
+        result -=
+            (totals.attack || 0)
+            * 0.1;
+
+    }
+
+
+    /*
+       Если включены и шкала, и перезарядка,
+       стараемся держать их близко друг к другу.
+    */
+
+    if (
+        enabledStats.includes("meter") &&
+        enabledStats.includes("cooldown")
+    ) {
+
+        const difference =
+            Math.abs(
+                (totals.meter || 0) -
+                Math.abs(
+                    totals.cooldown || 0
+                )
+            );
+
+
+        result +=
+            difference * 0.01;
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =====================================================
+   ПОИСК
+===================================================== */
+
+function findBest(
+    procSlots,
+    enabledStats
+) {
+
+    let states = [
+
+        {
+            slots: [],
+            totals: {}
+        }
+
+    ];
+
+
+    /*
+       Ограничение количества промежуточных
+       вариантов, чтобы телефон не зависал.
+    */
+
+    const LIMIT = 1500;
+
+
+    for (
+        let slotIndex = 0;
+        slotIndex < 5;
+        slotIndex++
+    ) {
+
+        const options =
+            createOptions(
+                procSlots[slotIndex],
+                enabledStats
+            );
+
 
         const next = [];
 
-        for (const state of states) {
 
-            for (const option of slotOptions) {
+        for (
+            const state of states
+        ) {
 
-                const newSlots = [...state.slots, option];
+            for (
+                const option of options
+            ) {
 
-                const totals = calculateTotals(
-                    newSlots,
-                    enabledStats
-                );
+                const newSlots = [
+                    ...state.slots,
+                    option
+                ];
 
-                const score = calculateScore(
-                    totals,
-                    enabledStats
-                );
+
+                const totals =
+                    calculateTotals(
+                        newSlots,
+                        enabledStats
+                    );
+
 
                 next.push({
+
                     slots: newSlots,
-                    totals,
-                    score
+
+                    totals: totals,
+
+                    score:
+                        score(
+                            totals,
+                            enabledStats
+                        )
+
                 });
+
             }
+
         }
 
-        next.sort((a, b) => a.score - b.score);
 
-        states = next.slice(0, BEAM_SIZE);
-    }
+        /*
+           Сначала самые перспективные.
+        */
 
-    for (const state of states) {
-
-        const totals = state.totals;
-
-        let score = calculateScore(
-            totals,
-            enabledStats
+        next.sort(
+            (a, b) =>
+                a.score - b.score
         );
 
-        if (isValid(totals, enabledStats)) {
 
-            // Сильный приоритет валидным комбинациям
-            score -= 1000000;
+        states =
+            next.slice(
+                0,
+                LIMIT
+            );
 
-            if (enabledStats.includes("attack")) {
-                score -= (totals.attack || 0) * 0.1;
-            }
+    }
 
-            if (score < bestScore) {
-                bestScore = score;
 
-                best = {
-                    slots: state.slots,
-                    totals
-                };
-            }
+    /*
+       Сначала ищем среди валидных.
+    */
+
+    const validStates =
+        states.filter(
+            state =>
+                isValid(
+                    state.totals,
+                    enabledStats
+                )
+        );
+
+
+    const candidates =
+        validStates.length > 0
+            ? validStates
+            : states;
+
+
+    candidates.sort(
+        (a, b) => {
+
+            const aScore =
+                score(
+                    a.totals,
+                    enabledStats
+                );
+
+            const bScore =
+                score(
+                    b.totals,
+                    enabledStats
+                );
+
+
+            return aScore - bScore;
+
         }
-    }
+    );
 
-    // Если полностью валидного варианта нет,
-    // возвращаем наиболее близкий вариант.
-    if (!best && states.length > 0) {
 
-        states.sort((a, b) => a.score - b.score);
+    return candidates[0];
 
-        best = {
-            slots: states[0].slots,
-            totals: states[0].totals
-        };
-    }
-
-    return best;
 }
 
 
-// ---------------------------------------------------------
-// Отображение результата
-// ---------------------------------------------------------
+/* =====================================================
+   ФОРМАТ ПРОЦЕНТА
+===================================================== */
 
-function calculate() {
+function formatPercent(value) {
 
-    const enabledStats = getEnabledStats();
+    if (
+        Number.isInteger(value)
+    ) {
 
-    const error = document.getElementById("error");
-    const result = document.getElementById("result");
+        return `${value}%`;
 
-    error.style.display = "none";
-    result.style.display = "none";
-
-    if (enabledStats.length < 3) {
-
-        error.innerHTML =
-            '<div class="error">' +
-            'Нужно выбрать минимум 3 характеристики.' +
-            '</div>';
-
-        error.style.display = "block";
-        return;
     }
 
-    const best = findBestCombination(enabledStats);
 
-    if (!best) {
+    return `${value.toFixed(1)}%`;
 
-        error.innerHTML =
-            '<div class="error">' +
-            'Не удалось найти комбинацию.' +
-            '</div>';
-
-        error.style.display = "block";
-        return;
-    }
-
-    displayResult(best, enabledStats);
-
-    result.style.display = "block";
 }
 
 
-// ---------------------------------------------------------
-// Вывод результатов
-// ---------------------------------------------------------
+/* =====================================================
+   ПОКАЗАТЬ РЕЗУЛЬТАТ
+===================================================== */
 
-function displayResult(best, enabledStats) {
+function showResult(
+    best,
+    enabledStats
+) {
 
-    const summary = document.getElementById("summary");
-    const remaining = document.getElementById("remaining");
-    const slots = document.getElementById("slots");
+    const result =
+        document.getElementById("result");
+
+    const summary =
+        document.getElementById("summary");
+
+    const remaining =
+        document.getElementById("remaining");
+
+    const slotResults =
+        document.getElementById("slotResults");
+
 
     summary.innerHTML = "";
     remaining.innerHTML = "";
-    slots.innerHTML = "";
+    slotResults.innerHTML = "";
 
-    const totals = best.totals;
 
-    for (const stat of enabledStats) {
+    const totals =
+        best.totals;
 
-        const div = document.createElement("div");
-        div.className = "summary-item";
 
-        div.innerHTML =
-            "<strong>" + STAT_NAMES[stat] + "</strong>" +
-            formatPercent(totals[stat] || 0);
+    /*
+       Основные характеристики.
+    */
 
-        summary.appendChild(div);
+    for (
+        const stat of enabledStats
+    ) {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "summary-item";
+
+
+        let value =
+            totals[stat] || 0;
+
+
+        let text =
+            formatPercent(value);
+
+
+        /*
+           Для крита дополнительно показываем
+           вариант без базовых 20%.
+        */
+
+        if (
+            stat === "crit"
+        ) {
+
+            text =
+                `
+                ${formatPercent(value)}
+                <br>
+                <span class="note">
+                    включая базовые 20%
+                </span>
+                `;
+
+        }
+
+
+        item.innerHTML = `
+
+            <strong>
+                ${STAT_NAMES[stat]}
+            </strong>
+
+            ${text}
+
+        `;
+
+
+        summary.appendChild(item);
+
     }
 
-    // Остаточные характеристики
-    const remainingStats = [
+
+    /*
+       Остаток.
+    */
+
+    const fillerStats = [
         "attack",
         "meter",
         "cooldown"
     ];
 
-    for (const stat of remainingStats) {
 
-        if (!enabledStats.includes(stat)) {
+    for (
+        const stat of fillerStats
+    ) {
+
+        if (
+            !enabledStats.includes(stat)
+        ) {
             continue;
         }
 
-        const div = document.createElement("div");
-        div.className = "summary-item remaining";
 
-        div.innerHTML =
-            "<strong>" + STAT_NAMES[stat] + "</strong>" +
-            formatPercent(totals[stat] || 0);
+        const item =
+            document.createElement("div");
 
-        remaining.appendChild(div);
+        item.className =
+            "summary-item";
+
+
+        item.innerHTML = `
+
+            <strong>
+                ${STAT_NAMES[stat]}
+            </strong>
+
+            ${formatPercent(
+                totals[stat] || 0
+            )}
+
+        `;
+
+
+        remaining.appendChild(item);
+
     }
 
-    if (remaining.innerHTML === "") {
 
-        remaining.innerHTML =
-            '<div class="summary-item">' +
-            '<strong>Нет</strong>' +
-            'Дополнительные характеристики не включены.' +
-            '</div>';
+    /*
+       Если дополнительных характеристик
+       нет.
+    */
+
+    if (
+        remaining.children.length === 0
+    ) {
+
+        remaining.innerHTML = `
+
+            <div class="summary-item">
+
+                <strong>
+                    Остаток
+                </strong>
+
+                Нет включённых
+                дополнительных характеристик.
+
+            </div>
+
+        `;
+
     }
 
-    // Слоты
-    best.slots.forEach((slot, index) => {
 
-        const div = document.createElement("div");
-        div.className = "slot";
+    /*
+       Распределение по слотам.
+    */
 
-        let html =
-            "<h3>Слот " + (index + 1) + "</h3>";
+    best.slots.forEach(
+        (slot, index) => {
 
-        for (let i = 0; i < 3; i++) {
+            const container =
+                document.createElement("div");
 
-            const stat = slot.stats[i];
-            const proc = slot.procs[i];
+            container.className =
+                "slot-result";
 
-            html +=
-                '<div class="stat-row">' +
-                    '<span>' +
-                        STAT_NAMES[stat] +
-                    '</span>' +
-                    '<strong>' +
-                        proc +
-                        ' проков' +
-                    '</strong>' +
-                '</div>';
+
+            container.innerHTML = `
+                <h3>
+                    Слот ${index + 1}
+                </h3>
+            `;
+
+
+            for (
+                let i = 0;
+                i < 3;
+                i++
+            ) {
+
+                const stat =
+                    slot.stats[i];
+
+                const proc =
+                    slot.procs[i];
+
+
+                let contribution =
+                    (proc + 1) * 3;
+
+
+                if (
+                    stat === "cooldown"
+                ) {
+
+                    contribution =
+                        -contribution;
+
+                }
+
+
+                const line =
+                    document.createElement("div");
+
+                line.className =
+                    "stat-line";
+
+
+                line.innerHTML = `
+
+                    <span>
+                        ${STAT_NAMES[stat]}
+                    </span>
+
+                    <span>
+
+                        <strong>
+                            ${proc} проков
+                        </strong>
+
+                        <span class="proc-result">
+                            → ${formatPercent(
+                                contribution
+                            )}
+                        </span>
+
+                    </span>
+
+                `;
+
+
+                container.appendChild(line);
+
+            }
+
+
+            slotResults.appendChild(
+                container
+            );
+
         }
+    );
 
-        html +=
-            '<p class="note">' +
-            'Всего проков: 14' +
-            '</p>';
 
-        div.innerHTML = html;
+    result.classList.remove(
+        "hidden"
+    );
 
-        slots.appendChild(div);
-    });
 }
 
 
-function formatPercent(value) {
+/* =====================================================
+   ЗАПУСК РАСЧЁТА
+===================================================== */
 
-    if (Number.isInteger(value)) {
-        return value + "%";
-    }
+document
+    .getElementById("calculateButton")
+    .addEventListener(
+        "click",
+        () => {
 
-    return value.toFixed(1) + "%";
-}
+            const error =
+                document.getElementById(
+                    "error"
+                );
+
+            const loading =
+                document.getElementById(
+                    "loading"
+                );
+
+            const result =
+                document.getElementById(
+                    "result"
+                );
+
+
+            error.classList.add(
+                "hidden"
+            );
+
+            result.classList.add(
+                "hidden"
+            );
+
+
+            /*
+               Проверяем характеристики.
+            */
+
+            const enabledStats =
+                getEnabledStats();
+
+
+            if (
+                enabledStats.length < 3
+            ) {
+
+                error.innerHTML = `
+
+                    <div class="error">
+
+                        Выбери минимум
+                        3 характеристики.
+
+                    </div>
+
+                `;
+
+                error.classList.remove(
+                    "hidden"
+                );
+
+                return;
+
+            }
+
+
+            /*
+               Получаем проки.
+            */
+
+            const procSlots =
+                getProcs();
+
+
+            /*
+               Проверяем все 15 ячеек.
+            */
+
+            const validationError =
+                validateProcs(
+                    procSlots
+                );
+
+
+            if (validationError) {
+
+                error.innerHTML = `
+
+                    <div class="error">
+
+                        ${validationError}
+
+                    </div>
+
+                `;
+
+                error.classList.remove(
+                    "hidden"
+                );
+
+                return;
+
+            }
+
+
+            /*
+               Показываем расчёт.
+            */
+
+            loading.classList.remove(
+                "hidden"
+            );
+
+
+            /*
+               Даём интерфейсу обновиться
+               перед тяжёлым расчётом.
+            */
+
+            setTimeout(
+                () => {
+
+                    const best =
+                        findBest(
+                            procSlots,
+                            enabledStats
+                        );
+
+
+                    loading.classList.add(
+                        "hidden"
+                    );
+
+
+                    if (!best) {
+
+                        error.innerHTML = `
+
+                            <div class="error">
+
+                                Не удалось найти
+                                подходящую комбинацию.
+
+                            </div>
+
+                        `;
+
+                        error.classList.remove(
+                            "hidden"
+                        );
+
+                        return;
+
+                    }
+
+
+                    showResult(
+                        best,
+                        enabledStats
+                    );
+
+                },
+
+                50
+            );
+
+        }
+    );
+
 
 </script>
 
