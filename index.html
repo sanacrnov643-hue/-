@@ -51,6 +51,7 @@ h3 {
     margin-bottom: 20px;
 }
 
+
 /* =========================================================
    ХАРАКТЕРИСТИКИ
    ========================================================= */
@@ -74,6 +75,7 @@ h3 {
     gap: 8px;
     cursor: pointer;
 }
+
 
 /* =========================================================
    ЦЕЛИ
@@ -125,16 +127,29 @@ h3 {
     color: #9ca3af;
 }
 
+
 /* =========================================================
    ПРОКИ
    ========================================================= */
 
 .proc-grid {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/*
+    ВАЖНО:
+
+    Старое расположение:
+    5 слотов стоят горизонтально.
+*/
+
+#procGrid {
     display: grid;
     grid-template-columns:
         repeat(5, minmax(120px, 1fr));
     gap: 10px;
-    overflow-x: auto;
+    width: 100%;
 }
 
 .slot {
@@ -183,6 +198,7 @@ h3 {
 .proc-sum.bad {
     color: #f87171;
 }
+
 
 /* =========================================================
    ПРИГЛАШЁННАЯ ЗВЕЗДА
@@ -287,6 +303,7 @@ h3 {
     color: #9ca3af;
 }
 
+
 /* =========================================================
    КНОПКА
    ========================================================= */
@@ -312,6 +329,7 @@ button:disabled {
     cursor: not-allowed;
 }
 
+
 /* =========================================================
    ПРОГРЕСС
    ========================================================= */
@@ -322,6 +340,7 @@ button:disabled {
     color: #93c5fd;
     min-height: 20px;
 }
+
 
 /* =========================================================
    РЕЗУЛЬТАТ
@@ -484,6 +503,7 @@ button:disabled {
     color: #93c5fd;
 }
 
+
 /* =========================================================
    МОБИЛЬНАЯ ВЕРСИЯ
    ========================================================= */
@@ -498,7 +518,7 @@ button:disabled {
         padding: 14px;
     }
 
-    .proc-grid {
+    #procGrid {
         grid-template-columns:
             repeat(5, 105px);
     }
@@ -524,6 +544,7 @@ button:disabled {
 
 </head>
 
+
 <body>
 
 <div class="container">
@@ -531,6 +552,11 @@ button:disabled {
 <h1>
     Калькулятор характеристик
 </h1>
+
+
+<!-- =====================================================
+     ХАРАКТЕРИСТИКИ
+     ===================================================== -->
 
 <div class="card">
 
@@ -638,6 +664,11 @@ button:disabled {
 
 </div>
 
+
+<!-- =====================================================
+     ЦЕЛИ
+     ===================================================== -->
+
 <div class="card">
 
 <h2>
@@ -663,6 +694,11 @@ button:disabled {
 
 </div>
 
+
+<!-- =====================================================
+     ПРОКИ
+     ===================================================== -->
+
 <div class="card">
 
 <h2>
@@ -676,16 +712,14 @@ button:disabled {
 
 <div class="proc-grid">
 
-<script>
-/*
-    Сами слоты создаются JavaScript-ом.
-    Это позволяет не дублировать HTML.
-*/
-</script>
-
 <div id="procGrid"></div>
 
 </div>
+
+
+<!-- =====================================================
+     ЗВЕЗДА
+     ===================================================== -->
 
 <div class="invited-star">
 
@@ -722,6 +756,7 @@ button:disabled {
 </div>
 
 </div>
+
 
 <div class="invited-star-grid">
 
@@ -763,6 +798,7 @@ button:disabled {
 
 </div>
 
+
 <div
     id="invitedStarSum"
     class="invited-star-sum bad"
@@ -771,6 +807,7 @@ button:disabled {
     <span>0</span>
     / 19
 </div>
+
 
 <div
     id="invitedStarZero"
@@ -781,6 +818,7 @@ button:disabled {
     / максимум 1
 </div>
 
+
 <div
     id="validationError"
     class="error"
@@ -789,6 +827,11 @@ button:disabled {
 </div>
 
 </div>
+
+
+<!-- =====================================================
+     ИСПОЛЬЗОВАНИЕ
+     ===================================================== -->
 
 <div class="card">
 
@@ -799,6 +842,11 @@ button:disabled {
 <div id="usage"></div>
 
 </div>
+
+
+<!-- =====================================================
+     КНОПКА
+     ===================================================== -->
 
 <div class="card">
 
@@ -813,6 +861,11 @@ button:disabled {
 ></div>
 
 </div>
+
+
+<!-- =====================================================
+     РЕЗУЛЬТАТ
+     ===================================================== -->
 
 <div
     class="card result"
@@ -829,9 +882,11 @@ button:disabled {
 
 </div>
 
+
 <script>
 
 "use strict";
+
 
 /* =========================================================
    КОНСТАНТЫ
@@ -865,6 +920,7 @@ const STAT_NAMES = {
 
 };
 
+
 const DEFAULT_TARGETS = {
 
     crit: 100,
@@ -884,6 +940,7 @@ const DEFAULT_TARGETS = {
     tagCooldown: -50
 
 };
+
 
 const BASE_VALUES = {
 
@@ -905,12 +962,14 @@ const BASE_VALUES = {
 
 };
 
+
 const COOLDOWN_STATS = [
 
     "moveCooldown",
     "tagCooldown"
 
 ];
+
 
 const TIE_BREAK_PRIORITY = [
 
@@ -925,6 +984,7 @@ const TIE_BREAK_PRIORITY = [
 
 ];
 
+
 const INVITED_STAR_TOTAL_PROCS = 19;
 
 const INVITED_STAR_MAX_PROC = 19;
@@ -932,6 +992,35 @@ const INVITED_STAR_MAX_PROC = 19;
 const INVITED_STAR_MAX_ZEROS = 1;
 
 const RESULT_LIMIT = 5;
+
+
+/*
+    =====================================================
+    ГЛАВНЫЙ ЛИМИТ ПОИСКА
+    =====================================================
+
+    Алгоритм больше НЕ перебирает бесконечно все состояния.
+
+    После каждого обычного слота остаётся максимум
+    4000 наиболее перспективных состояний.
+
+    При этом каждый из этих 4000 состояний проверяется
+    со всеми допустимыми назначениями следующего слота.
+
+    Можно увеличить:
+
+        4000 -> 8000
+
+    если нужен более широкий поиск.
+
+    Можно уменьшить:
+
+        4000 -> 2000
+
+    если нужен максимально быстрый расчёт.
+*/
+
+const MAX_STATES_PER_LEVEL = 4000;
 
 
 /* =========================================================
@@ -994,7 +1083,7 @@ const usage =
 
 
 /* =========================================================
-   СОЗДАНИЕ ОБЫЧНЫХ СЛОТОВ
+   СОЗДАНИЕ СЛОТОВ
    ========================================================= */
 
 function createProcSlots() {
@@ -1067,7 +1156,7 @@ function createProcSlots() {
 
 
 /* =========================================================
-   ПОЛУЧЕНИЕ PROС CELLS
+   PROС CELLS
    ========================================================= */
 
 function getProcCells() {
@@ -1082,7 +1171,7 @@ function getProcCells() {
 
 
 /* =========================================================
-   ЦЕЛИ
+   ХАРАКТЕРИСТИКИ
    ========================================================= */
 
 function getEnabledStats() {
@@ -1098,6 +1187,11 @@ function getEnabledStats() {
         );
 
 }
+
+
+/* =========================================================
+   ЦЕЛИ
+   ========================================================= */
 
 function createTargetsPanel() {
 
@@ -1173,6 +1267,7 @@ function createTargetsPanel() {
 
 }
 
+
 function getTargets() {
 
     const targets = {};
@@ -1233,7 +1328,7 @@ function getTargets() {
 
 
 /* =========================================================
-   НОРМАЛИЗАЦИЯ ПРОКА
+   НОРМАЛИЗАЦИЯ
    ========================================================= */
 
 function normalizeProcValue(
@@ -1317,6 +1412,7 @@ function getProcs() {
 
 }
 
+
 function getInvitedStarProcs() {
 
     return invitedStarCells.map(
@@ -1331,7 +1427,7 @@ function getInvitedStarProcs() {
 
 
 /* =========================================================
-   ПРОКОВЫЕ ЗНАЧЕНИЯ
+   ЗНАЧЕНИЯ ПРОКОВ
    ========================================================= */
 
 function procValue(
@@ -1362,6 +1458,7 @@ function procValue(
         );
 
 }
+
 
 function invitedStarProcValue(
     stat,
@@ -1538,7 +1635,7 @@ function metricsForTotals(
 
 
 /* =========================================================
-   СРАВНЕНИЕ МЕТРИК
+   СРАВНЕНИЕ
    ========================================================= */
 
 function compareMetricObjects(
@@ -1586,10 +1683,6 @@ function compareMetricObjects(
 
 }
 
-
-/* =========================================================
-   ПРИОРИТЕТ ПРИ РАВЕНСТВЕ
-   ========================================================= */
 
 function compareSolutions(
     a,
@@ -1661,7 +1754,7 @@ function compareSolutions(
 
 
 /* =========================================================
-   СРАВНЕНИЕ ДЛЯ TOP-N
+   TOP-N
    ========================================================= */
 
 function insertResult(
@@ -1669,12 +1762,6 @@ function insertResult(
     candidate,
     stats
 ) {
-
-    /*
-        Если уже существует точно такое же
-        итоговое распределение, оставляем
-        только один вариант.
-    */
 
     const same =
         results.some(
@@ -1727,7 +1814,7 @@ function insertResult(
 
 
 /* =========================================================
-   ГЕНЕРАЦИЯ ASSIGNMENTS
+   ASSIGNMENTS
    ========================================================= */
 
 function generateAssignments(
@@ -1753,7 +1840,9 @@ function generateAssignments(
             if (
                 b === a
             ) {
+
                 continue;
+
             }
 
             for (
@@ -1766,14 +1855,20 @@ function generateAssignments(
                     c === a ||
                     c === b
                 ) {
+
                     continue;
+
                 }
 
                 result.push([
 
                     {
-                        stat: stats[a],
-                        proc: procValues[0],
+                        stat:
+                            stats[a],
+
+                        proc:
+                            procValues[0],
+
                         value:
                             valueFunction(
                                 stats[a],
@@ -1782,8 +1877,12 @@ function generateAssignments(
                     },
 
                     {
-                        stat: stats[b],
-                        proc: procValues[1],
+                        stat:
+                            stats[b],
+
+                        proc:
+                            procValues[1],
+
                         value:
                             valueFunction(
                                 stats[b],
@@ -1792,8 +1891,12 @@ function generateAssignments(
                     },
 
                     {
-                        stat: stats[c],
-                        proc: procValues[2],
+                        stat:
+                            stats[c],
+
+                        proc:
+                            procValues[2],
+
                         value:
                             valueFunction(
                                 stats[c],
@@ -1815,7 +1918,7 @@ function generateAssignments(
 
 
 /* =========================================================
-   ДОБАВЛЕНИЕ ASSIGNMENT
+   ADD
    ========================================================= */
 
 function addAssignment(
@@ -1845,10 +1948,10 @@ function addAssignment(
 
 
 /* =========================================================
-   KEY
+   STATE KEY
    ========================================================= */
 
-function makeKey(
+function makeStateKey(
     totals,
     stats
 ) {
@@ -1856,9 +1959,7 @@ function makeKey(
     return stats
         .map(
             stat =>
-                (
-                    totals[stat] || 0
-                )
+                totals[stat] || 0
         )
         .join(",");
 
@@ -1866,464 +1967,18 @@ function makeKey(
 
 
 /* =========================================================
-   СОЗДАНИЕ ВОЗМОЖНЫХ ГРАНИЦ
+   СОЗДАНИЕ ПРИОРИТЕТА
    ========================================================= */
 
-/*
-    Для каждого оставшегося слота вычисляем
-    минимальный и максимальный вклад,
-    который МОЖЕТ получить конкретная
-    характеристика.
-
-    Это намеренно оптимистичная оценка.
-
-    Она может допустить невозможный идеальный
-    вариант, но никогда не отбросит вариант,
-    который действительно может стать лучшим.
-
-    Поэтому branch-and-bound остаётся безопасным.
-*/
-
-function buildFutureBounds(
-    stats,
-    ordinaryAssignments,
-    invitedAssignments,
-    startSlot
-) {
-
-    const minFuture = {};
-    const maxFuture = {};
-
-    stats.forEach(
-        stat => {
-
-            minFuture[stat] = 0;
-            maxFuture[stat] = 0;
-
-        }
-    );
-
-
-    /*
-        Обычные слоты
-    */
-
-    for (
-        let slot = startSlot;
-        slot < ordinaryAssignments.length;
-        slot++
-    ) {
-
-        const assignments =
-            ordinaryAssignments[slot];
-
-        for (
-            const stat of stats
-        ) {
-
-            let min = 0;
-            let max = 0;
-
-            for (
-                const assignment
-                of assignments
-            ) {
-
-                for (
-                    const item of assignment
-                ) {
-
-                    if (
-                        item.stat === stat
-                    ) {
-
-                        min =
-                            Math.min(
-                                min,
-                                item.value
-                            );
-
-                        max =
-                            Math.max(
-                                max,
-                                item.value
-                            );
-
-                    }
-
-                }
-
-            }
-
-            minFuture[stat] +=
-                min;
-
-            maxFuture[stat] +=
-                max;
-
-        }
-
-    }
-
-
-    /*
-        Звезда
-    */
-
-    for (
-        const stat of stats
-    ) {
-
-        let min = 0;
-        let max = 0;
-
-        for (
-            const assignment
-            of invitedAssignments
-        ) {
-
-            for (
-                const item of assignment
-            ) {
-
-                if (
-                    item.stat === stat
-                ) {
-
-                    min =
-                        Math.min(
-                            min,
-                            item.value
-                        );
-
-                    max =
-                        Math.max(
-                            max,
-                            item.value
-                        );
-
-                }
-
-            }
-
-        }
-
-        minFuture[stat] +=
-            min;
-
-        maxFuture[stat] +=
-            max;
-
-    }
-
-    return {
-
-        minFuture,
-        maxFuture
-
-    };
-
-}
-
-
-/* =========================================================
-   НИЖНЯЯ ГРАНИЦА
-   ========================================================= */
-
-/*
-    Возвращает минимально возможные:
-
-    deficit
-    overflow
-    distance
-
-    с учётом того, что ещё может произойти.
-
-    Если даже эта оптимистичная нижняя граница
-    хуже уже найденного результата,
-    ветку можно безопасно удалить.
-*/
-
-function lowerBoundMetrics(
+function stateScore(
     totals,
-    stats,
-    targets,
-    minFuture,
-    maxFuture
-) {
-
-    let deficit = 0;
-    let overflow = 0;
-    let distance = 0;
-
-    for (
-        const stat of stats
-    ) {
-
-        const current =
-            totals[stat] || 0;
-
-        let low =
-            current +
-            minFuture[stat];
-
-        let high =
-            current +
-            maxFuture[stat];
-
-        let lowValue =
-            finalValue(
-                stat,
-                low
-            );
-
-        let highValue =
-            finalValue(
-                stat,
-                high
-            );
-
-        if (
-            lowValue >
-            highValue
-        ) {
-
-            const temp =
-                lowValue;
-
-            lowValue =
-                highValue;
-
-            highValue =
-                temp;
-
-        }
-
-        const target =
-            targets[stat];
-
-        /*
-            Минимальный возможный недобор.
-        */
-
-        if (
-            !COOLDOWN_STATS.includes(stat)
-        ) {
-
-            if (
-                highValue < target
-            ) {
-
-                deficit +=
-                    target -
-                    highValue;
-
-            }
-
-            /*
-                Минимальный возможный перелив.
-            */
-
-            if (
-                lowValue > target
-            ) {
-
-                overflow +=
-                    lowValue -
-                    target;
-
-            }
-
-        } else {
-
-            /*
-                Для cooldown:
-
-                чем меньше значение,
-                тем лучше.
-
-                Недобор:
-                result > target.
-
-                Перелив:
-                result < target.
-            */
-
-            if (
-                lowValue > target
-            ) {
-
-                deficit +=
-                    lowValue -
-                    target;
-
-            }
-
-            if (
-                highValue < target
-            ) {
-
-                overflow +=
-                    target -
-                    highValue;
-
-            }
-
-        }
-
-        /*
-            Минимально возможное абсолютное
-            расстояние до цели.
-        */
-
-        if (
-            target <
-            lowValue
-        ) {
-
-            distance +=
-                lowValue -
-                target;
-
-        } else if (
-            target >
-            highValue
-        ) {
-
-            distance +=
-                target -
-                highValue;
-
-        }
-
-    }
-
-    return {
-
-        deficit,
-        overflow,
-        distance
-
-    };
-
-}
-
-
-/* =========================================================
-   МОЖНО ЛИ ОТСЕЧЬ
-   ========================================================= */
-
-function cannotBeat(
-    lowerBound,
-    results
-) {
-
-    /*
-        Пока TOP-5 не заполнен,
-        нельзя отсекать по худшему результату:
-        неизвестно, каким он будет.
-
-        Но если уже есть хотя бы один результат,
-        можно безопасно отсечь ветку только если
-        нижняя граница строго хуже лучшего результата.
-    */
-
-    if (
-        results.length === 0
-    ) {
-
-        return false;
-
-    }
-
-    /*
-        Для поиска TOP-5 используем худший
-        из уже сохранённых результатов как порог.
-
-        Если нижняя граница хуже него,
-        эта ветка точно не попадёт в TOP-5.
-    */
-
-    if (
-        results.length >= RESULT_LIMIT
-    ) {
-
-        const worst =
-            results[
-                results.length - 1
-            ].metrics;
-
-        if (
-            lowerBound.deficit >
-            worst.deficit
-        ) {
-
-            return true;
-
-        }
-
-        if (
-            lowerBound.deficit ===
-            worst.deficit &&
-            lowerBound.overflow >
-            worst.overflow
-        ) {
-
-            return true;
-
-        }
-
-        if (
-            lowerBound.deficit ===
-            worst.deficit &&
-            lowerBound.overflow ===
-            worst.overflow &&
-            lowerBound.distance >
-            worst.distance
-        ) {
-
-            return true;
-
-        }
-
-    }
-
-    return false;
-
-}
-
-
-/* =========================================================
-   СОРТИРОВКА ASSIGNMENTS
-   ========================================================= */
-
-/*
-    Это только порядок обхода.
-
-    Он НЕ удаляет варианты.
-
-    Поэтому точность поиска от него не зависит.
-
-    Сначала пробуем назначения, которые
-    визуально ближе к целям.
-*/
-
-function assignmentHeuristic(
-    totals,
-    assignment,
     stats,
     targets
 ) {
 
-    const next =
-        addAssignment(
-            totals,
-            assignment
-        );
-
     const metric =
         metricsForTotals(
-            next,
+            totals,
             stats,
             targets
         );
@@ -2338,20 +1993,18 @@ function assignmentHeuristic(
 
 
 /* =========================================================
-   ОСНОВНОЙ ПОИСК
+   SOLVE
    ========================================================= */
 
 function solve(
     stats,
     ordinaryProcs,
     invitedStarProcs,
-    targets,
-    reportProgress
+    targets
 ) {
 
     /*
-        Генерируем все допустимые назначения
-        каждого обычного слота.
+        Генерируем варианты обычных слотов.
     */
 
     const ordinaryAssignments =
@@ -2366,7 +2019,7 @@ function solve(
 
 
     /*
-        Генерируем все допустимые назначения звезды.
+        Генерируем варианты звезды.
     */
 
     const invitedAssignments =
@@ -2376,10 +2029,6 @@ function solve(
             invitedStarProcValue
         );
 
-
-    /*
-        Защита от некорректных данных.
-    */
 
     if (
         invitedAssignments.length === 0
@@ -2393,258 +2042,309 @@ function solve(
 
 
     /*
-        Для каждого уровня заранее рассчитываем
-        границы будущего вклада.
-
-        Это позволяет branch-and-bound работать
-        намного быстрее.
+        Начальное состояние.
     */
 
-    const futureBounds = [];
+    let states = [
 
-    for (
-        let slot = 0;
-        slot <= 5;
-        slot++
-    ) {
-
-        futureBounds[slot] =
-            buildFutureBounds(
-                stats,
-                ordinaryAssignments,
-                invitedAssignments,
-                slot
-            );
-
-    }
-
-
-    const results = [];
-
-    /*
-        Мемоизация.
-
-        Ключ:
-        номер слота + итоговые значения.
-
-        Если мы уже приходили в абсолютно такое
-        же состояние, повторно исследовать его
-        бессмысленно.
-    */
-
-    const visited =
-        new Set();
-
-    let nodesVisited = 0;
-    let nodesPruned = 0;
-
-
-    /*
-        Рекурсивный поиск.
-
-        slotIndex 0..4:
-        обычные слоты.
-
-        slotIndex 5:
-        все обычные слоты уже обработаны,
-        теперь перебираем звезду.
-    */
-
-    function dfs(
-        slotIndex,
-        totals,
-        slotsPath
-    ) {
-
-        nodesVisited++;
-
-        /*
-            Периодически сообщаем интерфейсу
-            о состоянии поиска.
-        */
-
-        if (
-            nodesVisited % 10000 === 0
-        ) {
-
-            reportProgress(
-                slotIndex,
-                nodesVisited,
-                nodesPruned,
-                visited.size,
-                results.length
-            );
-
+        {
+            totals: {},
+            slots: [],
+            score: 0
         }
 
+    ];
 
-        /*
-            Проверяем возможность улучшить TOP-5.
-        */
 
-        const bounds =
-            futureBounds[
+    let nodesVisited = 0;
+
+    let statesRemoved = 0;
+
+
+    /*
+        =====================================================
+        ОСНОВНОЙ ПОСЛОЙНЫЙ ПОИСК
+        =====================================================
+    */
+
+    for (
+        let slotIndex = 0;
+        slotIndex < 5;
+        slotIndex++
+    ) {
+
+        const assignments =
+            ordinaryAssignments[
                 slotIndex
             ];
 
-        const lowerBound =
-            lowerBoundMetrics(
-                totals,
-                stats,
-                targets,
-                bounds.minFuture,
-                bounds.maxFuture
-            );
-
-        if (
-            cannotBeat(
-                lowerBound,
-                results
-            )
-        ) {
-
-            nodesPruned++;
-
-            return;
-
-        }
-
 
         /*
-            Если все обычные слоты закончены,
-            перебираем звезду.
+            Map удаляет одинаковые итоговые
+            распределения характеристик.
+
+            Нам важен именно результат по статам,
+            а не одинаковые пути к нему.
         */
 
-        if (
-            slotIndex === 5
+        const nextMap =
+            new Map();
+
+
+        for (
+            const state of states
         ) {
 
             for (
                 const assignment
-                of invitedAssignments
+                of assignments
             ) {
 
-                const finalTotals =
+                nodesVisited++;
+
+
+                const nextTotals =
                     addAssignment(
-                        totals,
+                        state.totals,
                         assignment
                     );
 
-                const metrics =
-                    metricsForTotals(
-                        finalTotals,
+
+                const key =
+                    makeStateKey(
+                        nextTotals,
+                        stats
+                    );
+
+
+                /*
+                    Если такое состояние уже есть,
+                    оставляем более хороший путь.
+                */
+
+                const old =
+                    nextMap.get(
+                        key
+                    );
+
+
+                if (
+                    old
+                ) {
+
+                    /*
+                        Здесь paths с одинаковыми
+                        итоговыми статами эквивалентны
+                        для дальнейшего поиска.
+
+                        Оставляем путь с лучшим
+                        текущим score.
+                    */
+
+                    const newScore =
+                        stateScore(
+                            nextTotals,
+                            stats,
+                            targets
+                        );
+
+                    if (
+                        newScore <
+                        old.score
+                    ) {
+
+                        nextMap.set(
+                            key,
+                            {
+
+                                totals:
+                                    nextTotals,
+
+                                slots:
+                                    state.slots.concat([
+                                        assignment
+                                    ]),
+
+                                score:
+                                    newScore
+
+                            }
+                        );
+
+                    }
+
+                    continue;
+
+                }
+
+
+                const score =
+                    stateScore(
+                        nextTotals,
                         stats,
                         targets
                     );
 
-                const candidate = {
+
+                nextMap.set(
+                    key,
+                    {
+
+                        totals:
+                            nextTotals,
+
+                        slots:
+                            state.slots.concat([
+                                assignment
+                            ]),
+
+                        score
+
+                    }
+                );
+
+            }
+
+        }
+
+
+        /*
+            Сортируем состояния по близости
+            к целям.
+        */
+
+        let nextStates =
+            Array.from(
+                nextMap.values()
+            );
+
+
+        nextStates.sort(
+            (
+                a,
+                b
+            ) =>
+                a.score -
+                b.score
+        );
+
+
+        /*
+            Ограничение количества состояний.
+
+            Это и делает расчёт конечным.
+        */
+
+        if (
+            nextStates.length >
+            MAX_STATES_PER_LEVEL
+        ) {
+
+            statesRemoved +=
+                nextStates.length -
+                MAX_STATES_PER_LEVEL;
+
+            nextStates =
+                nextStates.slice(
+                    0,
+                    MAX_STATES_PER_LEVEL
+                );
+
+        }
+
+
+        states =
+            nextStates;
+
+
+        /*
+            Прогресс.
+        */
+
+        self.postMessage({
+
+            type:
+                "progress",
+
+            slot:
+                slotIndex + 1,
+
+            nodes:
+                nodesVisited,
+
+            pruned:
+                statesRemoved,
+
+            states:
+                states.length,
+
+            results:
+                0
+
+        });
+
+
+        if (
+            states.length === 0
+        ) {
+
+            break;
+
+        }
+
+    }
+
+
+    /*
+        =====================================================
+        ФИНАЛЬНЫЙ ЭТАП — ЗВЕЗДА
+        =====================================================
+    */
+
+    const results = [];
+
+
+    for (
+        const state of states
+    ) {
+
+        for (
+            const assignment
+            of invitedAssignments
+        ) {
+
+            const finalTotals =
+                addAssignment(
+                    state.totals,
+                    assignment
+                );
+
+
+            const metrics =
+                metricsForTotals(
+                    finalTotals,
+                    stats,
+                    targets
+                );
+
+
+            insertResult(
+                results,
+                {
 
                     totals:
                         finalTotals,
 
                     slots:
-                        slotsPath,
+                        state.slots,
 
                     invitedStar:
                         assignment,
 
                     metrics
 
-                };
-
-                insertResult(
-                    results,
-                    candidate,
-                    stats
-                );
-
-            }
-
-            return;
-
-        }
-
-
-        /*
-            Мемоизация.
-        */
-
-        const key =
-            slotIndex +
-            "|" +
-            makeKey(
-                totals,
+                },
                 stats
-            );
-
-        if (
-            visited.has(key)
-        ) {
-
-            return;
-
-        }
-
-        visited.add(key);
-
-
-        /*
-            Копируем массив, чтобы можно было
-            безопасно сортировать только порядок
-            обхода.
-        */
-
-        const assignments =
-            ordinaryAssignments[
-                slotIndex
-            ].slice();
-
-
-        /*
-            Сначала проверяем потенциально хорошие
-            варианты.
-
-            Важно:
-            мы НЕ удаляем остальные.
-        */
-
-        assignments.sort(
-            (
-                a,
-                b
-            ) =>
-                assignmentHeuristic(
-                    totals,
-                    a,
-                    stats,
-                    targets
-                ) -
-                assignmentHeuristic(
-                    totals,
-                    b,
-                    stats,
-                    targets
-                )
-        );
-
-
-        for (
-            const assignment
-            of assignments
-        ) {
-
-            const nextTotals =
-                addAssignment(
-                    totals,
-                    assignment
-                );
-
-            dfs(
-                slotIndex + 1,
-                nextTotals,
-                slotsPath.concat([
-                    assignment
-                ])
             );
 
         }
@@ -2652,34 +2352,40 @@ function solve(
     }
 
 
-    dfs(
-        0,
-        {},
-        []
-    );
+    /*
+        Финальная сортировка.
+    */
 
-
-    reportProgress(
-        5,
-        nodesVisited,
-        nodesPruned,
-        visited.size,
-        results.length
+    results.sort(
+        (
+            a,
+            b
+        ) =>
+            compareSolutions(
+                a,
+                b,
+                stats
+            )
     );
 
 
     return {
 
-        results,
+        results:
+            results.slice(
+                0,
+                RESULT_LIMIT
+            ),
 
         statistics: {
 
             nodesVisited,
 
-            nodesPruned,
+            nodesPruned:
+                statesRemoved,
 
             visitedStates:
-                visited.size
+                states.length
 
         }
 
@@ -2702,6 +2408,7 @@ function validate() {
 
     const invited =
         getInvitedStarProcs();
+
 
     if (
         stats.length < 3
@@ -2735,6 +2442,7 @@ function validate() {
                 0
             );
 
+
         if (
             sum !== 14
         ) {
@@ -2764,6 +2472,7 @@ function validate() {
             0
         );
 
+
     if (
         starSum !== 19
     ) {
@@ -2787,8 +2496,9 @@ function validate() {
                 value === 0
         ).length;
 
+
     if (
-        zeros > 1
+        zeros > INVITED_STAR_MAX_ZEROS
     ) {
 
         return {
@@ -2797,7 +2507,8 @@ function validate() {
 
             error:
                 `В «Приглашённой звезде» может быть ` +
-                `не больше одного нулевого прокa. Сейчас: ${zeros}.`
+                `не больше одного нулевого прокa. ` +
+                `Сейчас: ${zeros}.`
 
         };
 
@@ -2828,6 +2539,7 @@ function updateProcSums() {
             )
         ];
 
+
     slots.forEach(
         slot => {
 
@@ -2837,6 +2549,7 @@ function updateProcSums() {
                         ".proc-cell"
                     )
                 ];
+
 
             const sum =
                 inputs.reduce(
@@ -2852,20 +2565,24 @@ function updateProcSums() {
                     0
                 );
 
+
             const box =
                 slot.querySelector(
                     ".proc-sum"
                 );
+
 
             box.querySelector(
                 "span"
             ).textContent =
                 sum;
 
+
             box.classList.remove(
                 "ok",
                 "bad"
             );
+
 
             box.classList.add(
                 sum === 14
@@ -2884,6 +2601,7 @@ function updateInvitedStarSum() {
     const values =
         getInvitedStarProcs();
 
+
     const sum =
         values.reduce(
             (
@@ -2894,36 +2612,43 @@ function updateInvitedStarSum() {
             0
         );
 
+
     const zeros =
         values.filter(
             value =>
                 value === 0
         ).length;
 
+
     const sumBox =
         document.getElementById(
             "invitedStarSum"
         );
+
 
     const zeroBox =
         document.getElementById(
             "invitedStarZero"
         );
 
+
     sumBox.querySelector(
         "span"
     ).textContent =
         sum;
+
 
     zeroBox.querySelector(
         "span"
     ).textContent =
         zeros;
 
+
     sumBox.classList.remove(
         "ok",
         "bad"
     );
+
 
     sumBox.classList.add(
         sum === 19
@@ -2931,10 +2656,12 @@ function updateInvitedStarSum() {
             : "bad"
     );
 
+
     zeroBox.classList.remove(
         "good",
         "bad"
     );
+
 
     zeroBox.classList.add(
         zeros <= 1
@@ -2946,7 +2673,7 @@ function updateInvitedStarSum() {
 
 
 /* =========================================================
-   ФОРМАТ
+   FORMAT
    ========================================================= */
 
 function formatPercent(
@@ -2993,6 +2720,7 @@ function getStatus(
 
     }
 
+
     if (
         analysis.overflow > 0
     ) {
@@ -3009,6 +2737,7 @@ function getStatus(
 
     }
 
+
     return {
 
         text:
@@ -3023,7 +2752,7 @@ function getStatus(
 
 
 /* =========================================================
-   ОТОБРАЖЕНИЕ ОДНОГО ВАРИАНТА
+   ОТОБРАЖЕНИЕ ВАРИАНТА
    ========================================================= */
 
 function renderVariant(
@@ -3091,6 +2820,7 @@ function renderVariant(
 
             `;
 
+
             slot.forEach(
                 (
                     item,
@@ -3129,6 +2859,7 @@ function renderVariant(
                 }
             );
 
+
             html += `
                 </div>
             `;
@@ -3136,6 +2867,10 @@ function renderVariant(
         }
     );
 
+
+    /*
+        Звезда.
+    */
 
     html += `
 
@@ -3149,6 +2884,7 @@ function renderVariant(
             </h3>
 
     `;
+
 
     solution.invitedStar.forEach(
         (
@@ -3188,6 +2924,7 @@ function renderVariant(
         }
     );
 
+
     html += `
         </div>
     `;
@@ -3207,11 +2944,13 @@ function renderVariant(
 
     `;
 
+
     stats.forEach(
         stat => {
 
             const procTotal =
                 solution.totals[stat] || 0;
+
 
             const value =
                 finalValue(
@@ -3219,8 +2958,10 @@ function renderVariant(
                     procTotal
                 );
 
+
             const target =
                 targets[stat];
+
 
             const analysis =
                 analyzeStat(
@@ -3229,11 +2970,13 @@ function renderVariant(
                     target
                 );
 
+
             const status =
                 getStatus(
                     stat,
                     analysis
                 );
+
 
             html += `
 
@@ -3292,6 +3035,7 @@ function renderVariant(
         }
     );
 
+
     html += `
         </div>
     `;
@@ -3303,7 +3047,7 @@ function renderVariant(
 
 
 /* =========================================================
-   РЕЗУЛЬТАТ
+   ПОКАЗ РЕЗУЛЬТАТА
    ========================================================= */
 
 function showResults(
@@ -3315,6 +3059,7 @@ function showResults(
 
     result.style.display =
         "block";
+
 
     let html = `
 
@@ -3338,6 +3083,7 @@ function showResults(
 
     `;
 
+
     solutions.forEach(
         (
             solution,
@@ -3357,14 +3103,17 @@ function showResults(
 
 
     /*
-        Подробная таблица для первого варианта.
+        Подробное сравнение первого результата.
     */
 
     const best =
         solutions[0];
 
+
     let totalDeficit = 0;
+
     let totalOverflow = 0;
+
 
     html += `
 
@@ -3406,6 +3155,7 @@ function showResults(
 
     `;
 
+
     stats.forEach(
         stat => {
 
@@ -3415,8 +3165,10 @@ function showResults(
                     best.totals[stat] || 0
                 );
 
+
             const target =
                 targets[stat];
+
 
             const analysis =
                 analyzeStat(
@@ -3425,11 +3177,14 @@ function showResults(
                     target
                 );
 
+
             totalDeficit +=
                 analysis.deficit;
 
+
             totalOverflow +=
                 analysis.overflow;
+
 
             html += `
 
@@ -3497,6 +3252,7 @@ function showResults(
 
         }
     );
+
 
     html += `
 
@@ -3599,21 +3355,7 @@ function showResults(
             <div class="result-stat">
 
                 <span>
-                    Посещено состояний
-                </span>
-
-                <strong>
-                    ${statistics.visitedStates.toLocaleString(
-                        "ru-RU"
-                    )}
-                </strong>
-
-            </div>
-
-            <div class="result-stat">
-
-                <span>
-                    Проверено узлов
+                    Проверено комбинаций
                 </span>
 
                 <strong>
@@ -3624,22 +3366,54 @@ function showResults(
 
             </div>
 
+            <div class="result-stat">
+
+                <span>
+                    Отброшено состояний
+                </span>
+
+                <strong>
+                    ${statistics.nodesPruned.toLocaleString(
+                        "ru-RU"
+                    )}
+                </strong>
+
+            </div>
+
+            <div class="result-stat">
+
+                <span>
+                    Состояний осталось
+                </span>
+
+                <strong>
+                    ${statistics.visitedStates.toLocaleString(
+                        "ru-RU"
+                    )}
+                </strong>
+
+            </div>
+
             <p class="small">
 
-                Поиск использует точное ветвление,
-                мемоизацию и безопасное отсечение
-                ветвей, которые математически уже
-                не способны попасть в TOP-5.
+                Поиск ограничен конечным количеством
+                состояний на каждом этапе.
 
-                Произвольного лимита вроде
-                «оставить только 3000 состояний»
-                больше нет.
+                Максимум:
+                ${MAX_STATES_PER_LEVEL.toLocaleString(
+                    "ru-RU"
+                )}
+                состояний на уровень.
+
+                Поэтому расчёт не может уйти
+                в бесконечный перебор.
 
             </p>
 
         </div>
 
     `;
+
 
     resultContent.innerHTML =
         html;
@@ -3656,11 +3430,14 @@ function updateUsage() {
     const stats =
         getEnabledStats();
 
+
     const procs =
         getProcs();
 
+
     const star =
         getInvitedStarProcs();
+
 
     const ordinaryTotal =
         procs.reduce(
@@ -3680,6 +3457,7 @@ function updateUsage() {
             0
         );
 
+
     const starTotal =
         star.reduce(
             (
@@ -3690,11 +3468,13 @@ function updateUsage() {
             0
         );
 
+
     const zeros =
         star.filter(
             value =>
                 value === 0
         ).length;
+
 
     usage.innerHTML = `
 
@@ -3764,13 +3544,15 @@ function updateUsage() {
 
         <div class="search-mode">
 
-            Используется точный поиск с
-            мемоизацией и безопасным
-            branch-and-bound.
+            Используется конечный целевой поиск.
 
-            Временное состояние не удаляется
-            только потому, что оно сейчас
-            выглядит хуже цели.
+            После каждого слота остаются только
+            ${MAX_STATES_PER_LEVEL.toLocaleString(
+                "ru-RU"
+            )}
+            наиболее перспективных состояний.
+
+            Поиск не работает бесконечно.
 
         </div>
 
@@ -3799,6 +3581,7 @@ function refreshTargetsPanel() {
 
     const oldValues = {};
 
+
     document
         .querySelectorAll(
             ".target-input"
@@ -3814,7 +3597,9 @@ function refreshTargetsPanel() {
             }
         );
 
+
     createTargetsPanel();
+
 
     document
         .querySelectorAll(
@@ -3825,6 +3610,7 @@ function refreshTargetsPanel() {
 
                 const stat =
                     input.dataset.targetStat;
+
 
                 if (
                     oldValues[stat] !==
@@ -3857,8 +3643,10 @@ function startCalculation() {
     progress.textContent =
         "";
 
+
     const validation =
         validate();
+
 
     if (
         !validation.valid
@@ -3871,43 +3659,63 @@ function startCalculation() {
 
     }
 
+
     const stats =
         getEnabledStats();
+
 
     const ordinaryProcs =
         getProcs();
 
+
     const invitedStarProcs =
         getInvitedStarProcs();
+
 
     const targets =
         getTargets();
 
+
     calculateButton.disabled =
         true;
 
-    calculateButton.textContent =
-        "Идёт точный расчёт...";
 
+    calculateButton.textContent =
+        "Идёт расчёт...";
+
+
+    /*
+        =====================================================
+        WORKER CODE
+        =====================================================
+
+        Внутри Worker находятся все функции,
+        необходимые для самостоятельного расчёта.
+    */
 
     const workerCode = `
 
 "use strict";
 
-const STAT_NAMES =
-${JSON.stringify(STAT_NAMES)};
 
 const BASE_VALUES =
 ${JSON.stringify(BASE_VALUES)};
 
+
 const COOLDOWN_STATS =
 ${JSON.stringify(COOLDOWN_STATS)};
+
 
 const TIE_BREAK_PRIORITY =
 ${JSON.stringify(TIE_BREAK_PRIORITY)};
 
+
 const RESULT_LIMIT =
 ${RESULT_LIMIT};
+
+
+const MAX_STATES_PER_LEVEL =
+${MAX_STATES_PER_LEVEL};
 
 
 /* =====================================================
@@ -3991,6 +3799,7 @@ function finalValue(
         ) +
         procTotal;
 
+
     if (
         COOLDOWN_STATS.includes(stat)
     ) {
@@ -4002,6 +3811,7 @@ function finalValue(
             );
 
     }
+
 
     return value;
 
@@ -4045,6 +3855,7 @@ function analyzeStat(
 
     }
 
+
     return {
 
         deficit:
@@ -4080,8 +3891,11 @@ function metricsForTotals(
 ) {
 
     let deficit = 0;
+
     let overflow = 0;
+
     let distance = 0;
+
 
     for (
         const stat of stats
@@ -4093,6 +3907,7 @@ function metricsForTotals(
                 totals[stat] || 0
             );
 
+
         const analysis =
             analyzeStat(
                 stat,
@@ -4100,21 +3915,27 @@ function metricsForTotals(
                 targets[stat]
             );
 
+
         deficit +=
             analysis.deficit;
 
+
         overflow +=
             analysis.overflow;
+
 
         distance +=
             analysis.distance;
 
     }
 
+
     return {
 
         deficit,
+
         overflow,
+
         distance
 
     };
@@ -4123,7 +3944,7 @@ function metricsForTotals(
 
 
 /* =====================================================
-   COMPARE METRICS
+   COMPARE
    ===================================================== */
 
 function compareMetricObjects(
@@ -4143,6 +3964,7 @@ function compareMetricObjects(
 
     }
 
+
     if (
         a.overflow !==
         b.overflow
@@ -4154,6 +3976,7 @@ function compareMetricObjects(
             : 1;
 
     }
+
 
     if (
         a.distance !==
@@ -4167,14 +3990,11 @@ function compareMetricObjects(
 
     }
 
+
     return 0;
 
 }
 
-
-/* =====================================================
-   COMPARE SOLUTIONS
-   ===================================================== */
 
 function compareSolutions(
     a,
@@ -4186,11 +4006,13 @@ function compareSolutions(
         return -1;
     }
 
+
     const metricCompare =
         compareMetricObjects(
             a.metrics,
             b.metrics
         );
+
 
     if (
         metricCompare !== 0
@@ -4199,6 +4021,7 @@ function compareSolutions(
         return metricCompare;
 
     }
+
 
     for (
         const stat of TIE_BREAK_PRIORITY
@@ -4212,11 +4035,14 @@ function compareSolutions(
 
         }
 
+
         const av =
             a.totals[stat] || 0;
 
+
         const bv =
             b.totals[stat] || 0;
+
 
         if (
             av !== bv
@@ -4232,6 +4058,7 @@ function compareSolutions(
 
             }
 
+
             return av > bv
                 ? -1
                 : 1;
@@ -4240,13 +4067,14 @@ function compareSolutions(
 
     }
 
+
     return 0;
 
 }
 
 
 /* =====================================================
-   INSERT TOP RESULT
+   TOP-N
    ===================================================== */
 
 function insertResult(
@@ -4269,6 +4097,7 @@ function insertResult(
                 )
         );
 
+
     if (
         same
     ) {
@@ -4277,9 +4106,11 @@ function insertResult(
 
     }
 
+
     results.push(
         candidate
     );
+
 
     results.sort(
         (
@@ -4292,6 +4123,7 @@ function insertResult(
                 stats
             )
     );
+
 
     if (
         results.length >
@@ -4317,6 +4149,7 @@ function generateAssignments(
 
     const result = [];
 
+
     for (
         let a = 0;
         a < stats.length;
@@ -4337,6 +4170,7 @@ function generateAssignments(
 
             }
 
+
             for (
                 let c = 0;
                 c < stats.length;
@@ -4352,36 +4186,55 @@ function generateAssignments(
 
                 }
 
+
                 result.push([
 
                     {
-                        stat: stats[a],
-                        proc: procValues[0],
+
+                        stat:
+                            stats[a],
+
+                        proc:
+                            procValues[0],
+
                         value:
                             valueFunction(
                                 stats[a],
                                 procValues[0]
                             )
+
                     },
 
                     {
-                        stat: stats[b],
-                        proc: procValues[1],
+
+                        stat:
+                            stats[b],
+
+                        proc:
+                            procValues[1],
+
                         value:
                             valueFunction(
                                 stats[b],
                                 procValues[1]
                             )
+
                     },
 
                     {
-                        stat: stats[c],
-                        proc: procValues[2],
+
+                        stat:
+                            stats[c],
+
+                        proc:
+                            procValues[2],
+
                         value:
                             valueFunction(
                                 stats[c],
                                 procValues[2]
                             )
+
                     }
 
                 ]);
@@ -4391,6 +4244,7 @@ function generateAssignments(
         }
 
     }
+
 
     return result;
 
@@ -4410,6 +4264,7 @@ function addAssignment(
         ...totals
     };
 
+
     for (
         const item of assignment
     ) {
@@ -4422,6 +4277,7 @@ function addAssignment(
 
     }
 
+
     return next;
 
 }
@@ -4431,7 +4287,7 @@ function addAssignment(
    KEY
    ===================================================== */
 
-function makeKey(
+function makeStateKey(
     totals,
     stats
 ) {
@@ -4447,375 +4303,22 @@ function makeKey(
 
 
 /* =====================================================
-   FUTURE BOUNDS
+   SCORE
    ===================================================== */
 
-function buildFutureBounds(
-    stats,
-    ordinaryAssignments,
-    invitedAssignments,
-    startSlot
-) {
-
-    const minFuture = {};
-    const maxFuture = {};
-
-    stats.forEach(
-        stat => {
-
-            minFuture[stat] = 0;
-            maxFuture[stat] = 0;
-
-        }
-    );
-
-
-    /*
-        Обычные слоты.
-    */
-
-    for (
-        let slot = startSlot;
-        slot < ordinaryAssignments.length;
-        slot++
-    ) {
-
-        for (
-            const stat of stats
-        ) {
-
-            let min = 0;
-            let max = 0;
-
-            for (
-                const assignment
-                of ordinaryAssignments[slot]
-            ) {
-
-                for (
-                    const item of assignment
-                ) {
-
-                    if (
-                        item.stat === stat
-                    ) {
-
-                        min =
-                            Math.min(
-                                min,
-                                item.value
-                            );
-
-                        max =
-                            Math.max(
-                                max,
-                                item.value
-                            );
-
-                    }
-
-                }
-
-            }
-
-            minFuture[stat] +=
-                min;
-
-            maxFuture[stat] +=
-                max;
-
-        }
-
-    }
-
-
-    /*
-        Звезда.
-    */
-
-    for (
-        const stat of stats
-    ) {
-
-        let min = 0;
-        let max = 0;
-
-        for (
-            const assignment
-            of invitedAssignments
-        ) {
-
-            for (
-                const item of assignment
-            ) {
-
-                if (
-                    item.stat === stat
-                ) {
-
-                    min =
-                        Math.min(
-                            min,
-                            item.value
-                        );
-
-                    max =
-                        Math.max(
-                            max,
-                            item.value
-                        );
-
-                }
-
-            }
-
-        }
-
-        minFuture[stat] +=
-            min;
-
-        maxFuture[stat] +=
-            max;
-
-    }
-
-    return {
-
-        minFuture,
-        maxFuture
-
-    };
-
-}
-
-
-/* =====================================================
-   LOWER BOUND
-   ===================================================== */
-
-function lowerBoundMetrics(
+function stateScore(
     totals,
-    stats,
-    targets,
-    minFuture,
-    maxFuture
-) {
-
-    let deficit = 0;
-    let overflow = 0;
-    let distance = 0;
-
-    for (
-        const stat of stats
-    ) {
-
-        const current =
-            totals[stat] || 0;
-
-        let low =
-            current +
-            minFuture[stat];
-
-        let high =
-            current +
-            maxFuture[stat];
-
-        let lowValue =
-            finalValue(
-                stat,
-                low
-            );
-
-        let highValue =
-            finalValue(
-                stat,
-                high
-            );
-
-        if (
-            lowValue >
-            highValue
-        ) {
-
-            const temp =
-                lowValue;
-
-            lowValue =
-                highValue;
-
-            highValue =
-                temp;
-
-        }
-
-        const target =
-            targets[stat];
-
-
-        if (
-            !COOLDOWN_STATS.includes(stat)
-        ) {
-
-            if (
-                highValue < target
-            ) {
-
-                deficit +=
-                    target -
-                    highValue;
-
-            }
-
-            if (
-                lowValue > target
-            ) {
-
-                overflow +=
-                    lowValue -
-                    target;
-
-            }
-
-        } else {
-
-            if (
-                lowValue > target
-            ) {
-
-                deficit +=
-                    lowValue -
-                    target;
-
-            }
-
-            if (
-                highValue < target
-            ) {
-
-                overflow +=
-                    target -
-                    highValue;
-
-            }
-
-        }
-
-
-        if (
-            target < lowValue
-        ) {
-
-            distance +=
-                lowValue -
-                target;
-
-        } else if (
-            target > highValue
-        ) {
-
-            distance +=
-                target -
-                highValue;
-
-        }
-
-    }
-
-    return {
-
-        deficit,
-        overflow,
-        distance
-
-    };
-
-}
-
-
-/* =====================================================
-   PRUNE
-   ===================================================== */
-
-function cannotBeat(
-    lowerBound,
-    results
-) {
-
-    if (
-        results.length <
-        RESULT_LIMIT
-    ) {
-
-        return false;
-
-    }
-
-    const worst =
-        results[
-            results.length - 1
-        ].metrics;
-
-    if (
-        lowerBound.deficit >
-        worst.deficit
-    ) {
-
-        return true;
-
-    }
-
-    if (
-        lowerBound.deficit ===
-        worst.deficit &&
-        lowerBound.overflow >
-        worst.overflow
-    ) {
-
-        return true;
-
-    }
-
-    if (
-        lowerBound.deficit ===
-        worst.deficit &&
-        lowerBound.overflow ===
-        worst.overflow &&
-        lowerBound.distance >
-        worst.distance
-    ) {
-
-        return true;
-
-    }
-
-    return false;
-
-}
-
-
-/* =====================================================
-   HEURISTIC
-   ===================================================== */
-
-function assignmentHeuristic(
-    totals,
-    assignment,
     stats,
     targets
 ) {
 
-    const next =
-        addAssignment(
-            totals,
-            assignment
-        );
-
     const metric =
         metricsForTotals(
-            next,
+            totals,
             stats,
             targets
         );
+
 
     return (
         metric.deficit * 1000000 +
@@ -4847,6 +4350,7 @@ function solve(
                 )
         );
 
+
     const invitedAssignments =
         generateAssignments(
             stats,
@@ -4866,233 +4370,245 @@ function solve(
     }
 
 
-    const futureBounds = [];
+    let states = [
 
-    for (
-        let slot = 0;
-        slot <= 5;
-        slot++
-    ) {
+        {
 
-        futureBounds[slot] =
-            buildFutureBounds(
-                stats,
-                ordinaryAssignments,
-                invitedAssignments,
-                slot
-            );
+            totals: {},
 
-    }
+            slots: [],
 
+            score: 0
 
-    const results = [];
+        }
 
-    const visited =
-        new Set();
+    ];
+
 
     let nodesVisited = 0;
-    let nodesPruned = 0;
 
-    function dfs(
-        slotIndex,
-        totals,
-        slotsPath
+    let statesRemoved = 0;
+
+
+    /*
+        =================================================
+        5 ОБЫЧНЫХ СЛОТОВ
+        =================================================
+    */
+
+    for (
+        let slotIndex = 0;
+        slotIndex < 5;
+        slotIndex++
     ) {
-
-        nodesVisited++;
-
-
-        if (
-            nodesVisited % 10000 === 0
-        ) {
-
-            self.postMessage({
-
-                type:
-                    "progress",
-
-                slot:
-                    slotIndex,
-
-                nodes:
-                    nodesVisited,
-
-                pruned:
-                    nodesPruned,
-
-                states:
-                    visited.size,
-
-                results:
-                    results.length
-
-            });
-
-        }
-
-
-        const bounds =
-            futureBounds[
-                slotIndex
-            ];
-
-        const lowerBound =
-            lowerBoundMetrics(
-                totals,
-                stats,
-                targets,
-                bounds.minFuture,
-                bounds.maxFuture
-            );
-
-        if (
-            cannotBeat(
-                lowerBound,
-                results
-            )
-        ) {
-
-            nodesPruned++;
-
-            return;
-
-        }
-
-
-        /*
-            Все обычные слоты закончены.
-        */
-
-        if (
-            slotIndex === 5
-        ) {
-
-            for (
-                const assignment
-                of invitedAssignments
-            ) {
-
-                const finalTotals =
-                    addAssignment(
-                        totals,
-                        assignment
-                    );
-
-                const metrics =
-                    metricsForTotals(
-                        finalTotals,
-                        stats,
-                        targets
-                    );
-
-                insertResult(
-                    results,
-                    {
-
-                        totals:
-                            finalTotals,
-
-                        slots:
-                            slotsPath,
-
-                        invitedStar:
-                            assignment,
-
-                        metrics
-
-                    },
-                    stats
-                );
-
-            }
-
-            return;
-
-        }
-
-
-        /*
-            Мемоизация.
-        */
-
-        const key =
-            slotIndex +
-            "|" +
-            makeKey(
-                totals,
-                stats
-            );
-
-        if (
-            visited.has(key)
-        ) {
-
-            return;
-
-        }
-
-        visited.add(key);
-
-
-        /*
-            Сортируем только порядок обхода.
-            Все варианты всё равно остаются.
-        */
 
         const assignments =
             ordinaryAssignments[
                 slotIndex
-            ].slice();
+            ];
 
-        assignments.sort(
+
+        const nextMap =
+            new Map();
+
+
+        for (
+            const state of states
+        ) {
+
+            for (
+                const assignment
+                of assignments
+            ) {
+
+                nodesVisited++;
+
+
+                const nextTotals =
+                    addAssignment(
+                        state.totals,
+                        assignment
+                    );
+
+
+                const key =
+                    makeStateKey(
+                        nextTotals,
+                        stats
+                    );
+
+
+                const score =
+                    stateScore(
+                        nextTotals,
+                        stats,
+                        targets
+                    );
+
+
+                const old =
+                    nextMap.get(
+                        key
+                    );
+
+
+                if (
+                    !old ||
+                    score < old.score
+                ) {
+
+                    nextMap.set(
+                        key,
+                        {
+
+                            totals:
+                                nextTotals,
+
+                            slots:
+                                state.slots.concat([
+                                    assignment
+                                ]),
+
+                            score
+
+                        }
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        let nextStates =
+            Array.from(
+                nextMap.values()
+            );
+
+
+        nextStates.sort(
             (
                 a,
                 b
             ) =>
-                assignmentHeuristic(
-                    totals,
-                    a,
-                    stats,
-                    targets
-                ) -
-                assignmentHeuristic(
-                    totals,
-                    b,
-                    stats,
-                    targets
-                )
+                a.score -
+                b.score
         );
 
 
-        for (
-            const assignment
-            of assignments
+        if (
+            nextStates.length >
+            MAX_STATES_PER_LEVEL
         ) {
 
-            const nextTotals =
-                addAssignment(
-                    totals,
-                    assignment
+            statesRemoved +=
+                nextStates.length -
+                MAX_STATES_PER_LEVEL;
+
+
+            nextStates =
+                nextStates.slice(
+                    0,
+                    MAX_STATES_PER_LEVEL
                 );
 
-            dfs(
+        }
+
+
+        states =
+            nextStates;
+
+
+        self.postMessage({
+
+            type:
+                "progress",
+
+            slot:
                 slotIndex + 1,
-                nextTotals,
-                slotsPath.concat([
-                    assignment
-                ])
-            );
+
+            nodes:
+                nodesVisited,
+
+            pruned:
+                statesRemoved,
+
+            states:
+                states.length,
+
+            results:
+                0
+
+        });
+
+
+        if (
+            states.length === 0
+        ) {
+
+            break;
 
         }
 
     }
 
 
-    dfs(
-        0,
-        {},
-        []
-    );
+    /*
+        =================================================
+        ЗВЕЗДА
+        =================================================
+    */
+
+    const results = [];
+
+
+    for (
+        const state of states
+    ) {
+
+        for (
+            const assignment
+            of invitedAssignments
+        ) {
+
+            const finalTotals =
+                addAssignment(
+                    state.totals,
+                    assignment
+                );
+
+
+            const metrics =
+                metricsForTotals(
+                    finalTotals,
+                    stats,
+                    targets
+                );
+
+
+            insertResult(
+                results,
+                {
+
+                    totals:
+                        finalTotals,
+
+                    slots:
+                        state.slots,
+
+                    invitedStar:
+                        assignment,
+
+                    metrics
+
+                },
+                stats
+            );
+
+        }
+
+    }
 
 
     results.sort(
@@ -5110,16 +4626,21 @@ function solve(
 
     return {
 
-        results,
+        results:
+            results.slice(
+                0,
+                RESULT_LIMIT
+            ),
 
         statistics: {
 
             nodesVisited,
 
-            nodesPruned,
+            nodesPruned:
+                statesRemoved,
 
             visitedStates:
-                visited.size
+                states.length
 
         }
 
@@ -5139,6 +4660,7 @@ function(event) {
 
         const data =
             event.data;
+
 
         self.postMessage({
 
@@ -5200,6 +4722,12 @@ function(event) {
 `;
 
 
+    /*
+        =====================================================
+        СОЗДАЁМ WORKER
+        =====================================================
+    */
+
     const blob =
         new Blob(
             [workerCode],
@@ -5209,16 +4737,24 @@ function(event) {
             }
         );
 
+
     const url =
         URL.createObjectURL(
             blob
         );
+
 
     const worker =
         new Worker(
             url
         );
 
+
+    /*
+        =====================================================
+        MESSAGE HANDLER
+        =====================================================
+    */
 
     worker.onmessage =
     function(event) {
@@ -5233,7 +4769,7 @@ function(event) {
         ) {
 
             progress.textContent =
-                `Точный поиск запущен. ` +
+                `Расчёт запущен. ` +
                 `Выбрано характеристик: ` +
                 `${data.statsCount}.`;
 
@@ -5248,20 +4784,15 @@ function(event) {
         ) {
 
             progress.textContent =
-                `Поиск: проверено ` +
+                `Слот ${data.slot}/5: ` +
+                `проверено ` +
                 `${data.nodes.toLocaleString(
                     "ru-RU"
-                )} узлов, ` +
-                `отсечено ` +
-                `${data.pruned.toLocaleString(
-                    "ru-RU"
-                )}, ` +
-                `сохранено состояний ` +
+                )} комбинаций, ` +
+                `оставлено ` +
                 `${data.states.toLocaleString(
                     "ru-RU"
-                )}, ` +
-                `найдено вариантов: ` +
-                `${data.results}/5.`;
+                )} состояний.`;
 
             return;
 
@@ -5277,15 +4808,19 @@ function(event) {
                 "Ошибка расчёта: " +
                 data.error;
 
+
             calculateButton.disabled =
                 false;
+
 
             calculateButton.textContent =
                 "Рассчитать ближайшие комбинации";
 
+
             URL.revokeObjectURL(
                 url
             );
+
 
             worker.terminate();
 
@@ -5302,12 +4837,15 @@ function(event) {
             calculateButton.disabled =
                 false;
 
+
             calculateButton.textContent =
                 "Рассчитать ближайшие комбинации";
+
 
             URL.revokeObjectURL(
                 url
             );
+
 
             worker.terminate();
 
@@ -5330,6 +4868,7 @@ function(event) {
                 `Найдено ${data.result.length} ` +
                 `наиболее близких вариантов.`;
 
+
             showResults(
                 data.result,
                 stats,
@@ -5342,6 +4881,12 @@ function(event) {
     };
 
 
+    /*
+        =====================================================
+        WORKER ERROR
+        =====================================================
+    */
+
     worker.onerror =
     function(error) {
 
@@ -5349,23 +4894,34 @@ function(event) {
             error
         );
 
+
         progress.textContent =
             "Произошла ошибка расчёта.";
+
 
         calculateButton.disabled =
             false;
 
+
         calculateButton.textContent =
             "Рассчитать ближайшие комбинации";
+
 
         URL.revokeObjectURL(
             url
         );
 
+
         worker.terminate();
 
     };
 
+
+    /*
+        =====================================================
+        ЗАПУСК
+        =====================================================
+    */
 
     worker.postMessage({
 
@@ -5386,6 +4942,11 @@ function(event) {
 /* =========================================================
    EVENTS
    ========================================================= */
+
+
+/*
+    Скрытие результата.
+*/
 
 function hideResult() {
 
@@ -5415,6 +4976,7 @@ document.addEventListener(
                     14
                 );
 
+
             if (
                 event.target.value !== ""
             ) {
@@ -5424,8 +4986,11 @@ document.addEventListener(
 
             }
 
+
             updateProcSums();
+
             updateUsage();
+
             hideResult();
 
         }
@@ -5457,8 +5022,11 @@ invitedStarCells.forEach(
 
                 }
 
+
                 updateInvitedStarSum();
+
                 updateUsage();
+
                 hideResult();
 
             }
@@ -5480,7 +5048,9 @@ statChecks.forEach(
             function() {
 
                 refreshTargetsPanel();
+
                 updateUsage();
+
                 hideResult();
 
             }
@@ -5508,13 +5078,16 @@ targetsGrid.addEventListener(
 
         }
 
+
         const stat =
             event.target.dataset.targetStat;
+
 
         let value =
             Number(
                 event.target.value
             );
+
 
         if (
             !Number.isFinite(value)
@@ -5524,8 +5097,10 @@ targetsGrid.addEventListener(
 
         }
 
+
         value =
             Math.floor(value);
+
 
         if (
             COOLDOWN_STATS.includes(stat)
@@ -5542,8 +5117,10 @@ targetsGrid.addEventListener(
 
         }
 
+
         event.target.value =
             value;
+
 
         hideResult();
 
@@ -5580,5 +5157,3 @@ updateUsage();
 </body>
 
 </html>
-
-    
