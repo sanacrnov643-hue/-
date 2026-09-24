@@ -276,7 +276,6 @@ button:disabled {
             <div class="proc-sum">Сумма: <span>14</span></div>
         </div>
 
-
         <div class="slot">
             <div class="slot-title">Слот 2</div>
 
@@ -286,7 +285,6 @@ button:disabled {
 
             <div class="proc-sum">Сумма: <span>14</span></div>
         </div>
-
 
         <div class="slot">
             <div class="slot-title">Слот 3</div>
@@ -298,7 +296,6 @@ button:disabled {
             <div class="proc-sum">Сумма: <span>14</span></div>
         </div>
 
-
         <div class="slot">
             <div class="slot-title">Слот 4</div>
 
@@ -308,7 +305,6 @@ button:disabled {
 
             <div class="proc-sum">Сумма: <span>14</span></div>
         </div>
-
 
         <div class="slot">
             <div class="slot-title">Слот 5</div>
@@ -389,13 +385,7 @@ const STAT_NAMES = {
 
 
 /*
-    Все значения считаются в проках.
-
-    0 проков:
-    обычные статы = +3%
-    cooldown = -3%
-
-    Каждый прок добавляет ещё 3%.
+    Диапазоны итоговых характеристик.
 */
 
 const RANGES = {
@@ -447,7 +437,6 @@ const RANGES = {
 
 /*
     Базовый шанс крита персонажа.
-    Он НЕ занимает прок.
 */
 
 const BASE_CRIT = 20;
@@ -457,9 +446,11 @@ const BASE_CRIT = 20;
    DOM
    ========================================================= */
 
-const procCells = [...document.querySelectorAll(".proc-cell")];
+const procCells =
+    [...document.querySelectorAll(".proc-cell")];
 
-const statChecks = [...document.querySelectorAll(".stat-check")];
+const statChecks =
+    [...document.querySelectorAll(".stat-check")];
 
 const calculateButton =
     document.getElementById("calculateButton");
@@ -490,28 +481,41 @@ function getProcs() {
 
     for (let slot = 0; slot < 5; slot++) {
 
-        const cells = procCells.filter(
-            cell => Number(cell.dataset.slot) === slot
-        );
+        const cells =
+            procCells.filter(
+                cell =>
+                    Number(cell.dataset.slot) === slot
+            );
 
-        const values = cells.map(cell => {
+        const values =
+            cells.map(cell => {
 
-            let value = Number(cell.value);
+                let value =
+                    Number(cell.value);
 
-            if (!Number.isFinite(value)) {
-                value = 0;
-            }
+                if (!Number.isFinite(value)) {
+                    value = 0;
+                }
 
-            value = Math.max(0, Math.min(14, Math.floor(value)));
+                value =
+                    Math.max(
+                        0,
+                        Math.min(
+                            14,
+                            Math.floor(value)
+                        )
+                    );
 
-            return value;
+                return value;
 
-        });
+            });
 
         slots.push(values);
+
     }
 
     return slots;
+
 }
 
 
@@ -534,13 +538,16 @@ function getEnabledStats() {
 
 function validate() {
 
-    const procs = getProcs();
+    const procs =
+        getProcs();
+
 
     if (getEnabledStats().length < 3) {
 
         return {
             valid: false,
-            error: "Нужно выбрать минимум 3 характеристики."
+            error:
+                "Нужно выбрать минимум 3 характеристики."
         };
 
     }
@@ -553,12 +560,14 @@ function validate() {
             procs[i][1] +
             procs[i][2];
 
+
         if (sum !== 14) {
 
             return {
                 valid: false,
                 error:
-                    `В слоте ${i + 1} сумма проков должна быть 14. Сейчас: ${sum}.`
+                    `В слоте ${i + 1} сумма проков ` +
+                    `должна быть 14. Сейчас: ${sum}.`
             };
 
         }
@@ -583,6 +592,7 @@ function updateProcSums() {
     const slots =
         document.querySelectorAll(".slot");
 
+
     slots.forEach(slot => {
 
         const inputs =
@@ -595,20 +605,30 @@ function updateProcSums() {
                 0
             );
 
+
         const span =
             slot.querySelector(".proc-sum span");
 
         const box =
             slot.querySelector(".proc-sum");
 
+
         span.textContent = sum;
 
-        box.classList.remove("ok", "bad");
+        box.classList.remove(
+            "ok",
+            "bad"
+        );
+
 
         if (sum === 14) {
+
             box.classList.add("ok");
+
         } else {
+
             box.classList.add("bad");
+
         }
 
     });
@@ -629,11 +649,16 @@ function procValue(stat, proc) {
         14 проков = 45%
     */
 
-    const value = 3 * (proc + 1);
+    const value =
+        3 * (proc + 1);
+
 
     if (stat === "cooldown") {
+
         return -value;
+
     }
+
 
     return value;
 
@@ -641,70 +666,86 @@ function procValue(stat, proc) {
 
 
 /* =========================================================
-   ГЕНЕРАЦИЯ ВАРИАНТОВ ДЛЯ ОДНОГО СЛОТА
+   ГЕНЕРАЦИЯ ВАРИАНТОВ
    ========================================================= */
 
-function generateAssignments(stats, procValues) {
+function generateAssignments(
+    stats,
+    procValues
+) {
 
     const result = [];
 
-    /*
-        В одном слоте три РАЗНЫЕ характеристики.
 
-        Например:
+    for (
+        let a = 0;
+        a < stats.length;
+        a++
+    ) {
 
-        [crit, penetration, accuracy]
-
-        [crit, accuracy, penetration]
-
-        и т.д.
-
-        Если выбрано 7 статов:
-        7 * 6 * 5 = 210 вариантов.
-
-        Но это только 210 вариантов ДЛЯ ОДНОГО СЛОТА.
-        Мы больше НЕ делаем 210^5.
-    */
-
-    for (let a = 0; a < stats.length; a++) {
-
-        for (let b = 0; b < stats.length; b++) {
+        for (
+            let b = 0;
+            b < stats.length;
+            b++
+        ) {
 
             if (b === a) continue;
 
-            for (let c = 0; c < stats.length; c++) {
 
-                if (c === a || c === b) continue;
+            for (
+                let c = 0;
+                c < stats.length;
+                c++
+            ) {
 
-                const assignment = [
+                if (
+                    c === a ||
+                    c === b
+                ) {
+                    continue;
+                }
+
+
+                result.push([
 
                     {
                         stat: stats[a],
                         proc: procValues[0],
-                        value: procValue(stats[a], procValues[0])
+                        value:
+                            procValue(
+                                stats[a],
+                                procValues[0]
+                            )
                     },
 
                     {
                         stat: stats[b],
                         proc: procValues[1],
-                        value: procValue(stats[b], procValues[1])
+                        value:
+                            procValue(
+                                stats[b],
+                                procValues[1]
+                            )
                     },
 
                     {
                         stat: stats[c],
                         proc: procValues[2],
-                        value: procValue(stats[c], procValues[2])
+                        value:
+                            procValue(
+                                stats[c],
+                                procValues[2]
+                            )
                     }
 
-                ];
-
-                result.push(assignment);
+                ]);
 
             }
 
         }
 
     }
+
 
     return result;
 
@@ -715,16 +756,24 @@ function generateAssignments(stats, procValues) {
    СОЗДАНИЕ НОВЫХ ИТОГОВ
    ========================================================= */
 
-function addAssignment(totals, assignment) {
+function addAssignment(
+    totals,
+    assignment
+) {
 
-    const result = { ...totals };
+    const result = {
+        ...totals
+    };
+
 
     for (const item of assignment) {
 
         result[item.stat] =
-            (result[item.stat] || 0) + item.value;
+            (result[item.stat] || 0) +
+            item.value;
 
     }
+
 
     return result;
 
@@ -732,7 +781,7 @@ function addAssignment(totals, assignment) {
 
 
 /* =========================================================
-   ПРОВЕРКА: МОЖЕТ ЛИ СОСТОЯНИЕ БЫТЬ ДОСТИЖИМО
+   ПРОВЕРКА ВОЗМОЖНОСТИ
    ========================================================= */
 
 function stateStillPossible(
@@ -743,39 +792,43 @@ function stateStillPossible(
 
     for (const stat of stats) {
 
-        const range = RANGES[stat];
+        const range =
+            RANGES[stat];
 
         const current =
             totals[stat] || 0;
 
 
-        /*
-            Каждый оставшийся слот даёт
-            максимум 45% этой характеристики.
-        */
-
         const maxPossible =
-            current + slotsLeft * 45;
+            current +
+            slotsLeft * 45;
 
-        /*
-            Для cooldown максимум по модулю
-            также 45% за слот.
-        */
 
         const minPossible =
-            current - slotsLeft * 45;
+            current -
+            slotsLeft * 45;
 
 
         if (stat !== "cooldown") {
 
-            if (maxPossible < range.min) {
+            if (
+                maxPossible <
+                range.min
+            ) {
+
                 return false;
+
             }
 
         } else {
 
-            if (minPossible > range.max) {
+            if (
+                minPossible >
+                range.max
+            ) {
+
                 return false;
+
             }
 
         }
@@ -789,96 +842,115 @@ function stateStillPossible(
 
 
 /* =========================================================
-   ПРОВЕРКА ФИНАЛЬНОГО СОСТОЯНИЯ
+   ФИНАЛЬНАЯ ПРОВЕРКА
    ========================================================= */
 
-function isValidFinalState(totals, stats) {
+function isValidFinalState(
+    totals,
+    stats
+) {
 
     for (const stat of stats) {
 
-        const range = RANGES[stat];
+        const range =
+            RANGES[stat];
 
         const value =
             totals[stat] || 0;
 
 
         /*
-            Для обязательных характеристик
-            проверяем диапазон.
-
-            Для дополнительных:
-            достаточно не выйти за максимум.
+            Обязательные характеристики.
         */
 
-        if (stat === "crit") {
+        if (
+            stat === "crit" ||
+            stat === "penetration" ||
+            stat === "accuracy" ||
+            stat === "critDamage"
+        ) {
+
+            let finalValue =
+                value;
+
+
+            if (stat === "crit") {
+
+                finalValue +=
+                    BASE_CRIT;
+
+            }
+
 
             if (
-                value < range.min ||
-                value > range.max
+                finalValue <
+                range.min ||
+                finalValue >
+                range.max
             ) {
+
                 return false;
+
             }
 
         }
 
-        else if (stat === "penetration") {
+
+        /*
+            Атака.
+        */
+
+        if (stat === "attack") {
 
             if (
-                value < range.min ||
-                value > range.max
+                value >
+                range.max
             ) {
+
                 return false;
+
             }
 
         }
 
-        else if (stat === "accuracy") {
+
+        /*
+            Прирост шкалы.
+        */
+
+        if (stat === "meter") {
 
             if (
-                value < range.min ||
-                value > range.max
+                value >
+                range.max
             ) {
+
                 return false;
+
             }
 
         }
 
-        else if (stat === "critDamage") {
+
+        /*
+            Перезарядка.
+        */
+
+        if (stat === "cooldown") {
 
             if (
-                value < range.min ||
-                value > range.max
+                value <
+                range.min
             ) {
+
                 return false;
-            }
 
-        }
-
-        else if (stat === "attack") {
-
-            if (value > range.max) {
-                return false;
-            }
-
-        }
-
-        else if (stat === "meter") {
-
-            if (value > range.max) {
-                return false;
-            }
-
-        }
-
-        else if (stat === "cooldown") {
-
-            if (value < range.min) {
-                return false;
             }
 
         }
 
     }
+
 
     return true;
 
@@ -886,151 +958,304 @@ function isValidFinalState(totals, stats) {
 
 
 /* =========================================================
-   ОЦЕНКА СОСТОЯНИЯ
+   НОВАЯ ОЦЕНКА СОСТОЯНИЯ
    ========================================================= */
 
-function scoreState(totals, stats) {
+function scoreState(
+    totals,
+    stats
+) {
 
     let score = 0;
 
+
     /*
-        Главная задача:
-
-        1. Обязательные диапазоны.
-        2. Не тратить лишнюю статы.
-        3. Крит урон ближе к целевому.
-        4. Остаток отправлять в атаку.
-        5. Дополнительные характеристики используются позже.
+        ================================================
+        ПРИОРИТЕТ №1 — АТАКА
+        ================================================
     */
-
-
-    /* -----------------------------------------
-       КРИТ
-       ----------------------------------------- */
-
-    if (stats.includes("crit")) {
-
-        const value = totals.crit || 0;
-
-        const target = RANGES.crit.target;
-
-        score -= Math.abs(value - target) * 100000;
-
-    }
-
-
-    /* -----------------------------------------
-       ПРОНИЦАНИЕ
-       ----------------------------------------- */
-
-    if (stats.includes("penetration")) {
-
-        const value = totals.penetration || 0;
-
-        const target =
-            RANGES.penetration.target;
-
-        score -= Math.abs(value - target) * 100000;
-
-    }
-
-
-    /* -----------------------------------------
-       ТОЧНОСТЬ
-       ----------------------------------------- */
-
-    if (stats.includes("accuracy")) {
-
-        const value = totals.accuracy || 0;
-
-        const target =
-            RANGES.accuracy.target;
-
-        score -= Math.abs(value - target) * 100000;
-
-    }
-
-
-    /* -----------------------------------------
-       УРОН КРИТА
-       ----------------------------------------- */
-
-    if (stats.includes("critDamage")) {
-
-        const value =
-            totals.critDamage || 0;
-
-        const target =
-            RANGES.critDamage.target;
-
-        score -= Math.abs(value - target) * 10000;
-
-        /*
-            После достижения диапазона
-            не хочется бессмысленно завышать
-            crit damage.
-        */
-
-        if (value >= RANGES.critDamage.min) {
-
-            score -=
-                Math.max(
-                    0,
-                    value - RANGES.critDamage.target
-                ) * 100;
-
-        }
-
-    }
-
-
-    /* -----------------------------------------
-       АТАКА
-       ----------------------------------------- */
 
     if (stats.includes("attack")) {
 
         const value =
             totals.attack || 0;
 
+
         /*
-            Чем больше атаки после выполнения
-            обязательных требований — тем лучше.
+            Самый большой вес.
         */
 
-        score += value * 50;
+        score +=
+            value * 1000;
 
     }
 
 
-    /* -----------------------------------------
-       METER
-       ----------------------------------------- */
+    /*
+        ================================================
+        ПРИОРИТЕТ №2 — УРОН КРИТА
+        ================================================
+    */
+
+    if (stats.includes("critDamage")) {
+
+        const value =
+            totals.critDamage || 0;
+
+
+        score +=
+            value * 900;
+
+
+        /*
+            Сильно штрафуем выход
+            за максимальный диапазон.
+        */
+
+        if (
+            value >
+            RANGES.critDamage.max
+        ) {
+
+            score -=
+                (
+                    value -
+                    RANGES.critDamage.max
+                ) * 1000000;
+
+        }
+
+    }
+
+
+    /*
+        ================================================
+        ПРИОРИТЕТ №3 — ШАНС КРИТА
+        ================================================
+    */
+
+    if (stats.includes("crit")) {
+
+        const value =
+            totals.crit || 0;
+
+
+        /*
+            Средний приоритет.
+        */
+
+        score +=
+            value * 300;
+
+
+        const finalCrit =
+            value +
+            BASE_CRIT;
+
+
+        /*
+            Крит обязательно должен
+            попасть в 70–90%.
+        */
+
+        if (
+            finalCrit <
+            RANGES.crit.min
+        ) {
+
+            score -=
+                (
+                    RANGES.crit.min -
+                    finalCrit
+                ) * 1000000;
+
+        }
+
+
+        if (
+            finalCrit >
+            RANGES.crit.max
+        ) {
+
+            score -=
+                (
+                    finalCrit -
+                    RANGES.crit.max
+                ) * 1000000;
+
+        }
+
+    }
+
+
+    /*
+        ================================================
+        ПРИОРИТЕТ №4 — ПРОНИЦАНИЕ
+        ================================================
+    */
+
+    if (stats.includes("penetration")) {
+
+        const value =
+            totals.penetration || 0;
+
+
+        /*
+            Маленький вес.
+
+            Поэтому сюда будут уходить
+            маленькие проки и остатки.
+        */
+
+        score +=
+            value * 50;
+
+
+        /*
+            Обязательный минимум.
+        */
+
+        if (
+            value <
+            RANGES.penetration.min
+        ) {
+
+            score -=
+                (
+                    RANGES.penetration.min -
+                    value
+                ) * 1000000;
+
+        }
+
+
+        /*
+            Не позволяем выйти
+            за максимум.
+        */
+
+        if (
+            value >
+            RANGES.penetration.max
+        ) {
+
+            score -=
+                (
+                    value -
+                    RANGES.penetration.max
+                ) * 1000000;
+
+        }
+
+    }
+
+
+    /*
+        ================================================
+        ТОЧНОСТЬ
+        ================================================
+    */
+
+    if (stats.includes("accuracy")) {
+
+        const value =
+            totals.accuracy || 0;
+
+
+        score +=
+            value * 20;
+
+
+        if (
+            value <
+            RANGES.accuracy.min
+        ) {
+
+            score -=
+                (
+                    RANGES.accuracy.min -
+                    value
+                ) * 1000000;
+
+        }
+
+
+        if (
+            value >
+            RANGES.accuracy.max
+        ) {
+
+            score -=
+                (
+                    value -
+                    RANGES.accuracy.max
+                ) * 1000000;
+
+        }
+
+    }
+
+
+    /*
+        ================================================
+        ПРИРОСТ ШКАЛЫ
+        ================================================
+    */
 
     if (stats.includes("meter")) {
 
         const value =
             totals.meter || 0;
 
-        score += value * 5;
+
+        score +=
+            value * 10;
+
+
+        if (
+            value >
+            RANGES.meter.max
+        ) {
+
+            score -=
+                (
+                    value -
+                    RANGES.meter.max
+                ) * 1000000;
+
+        }
 
     }
 
 
-    /* -----------------------------------------
-       COOLDOWN
-       ----------------------------------------- */
+    /*
+        ================================================
+        ПЕРЕЗАРЯДКА
+        ================================================
+    */
 
     if (stats.includes("cooldown")) {
 
         const value =
             totals.cooldown || 0;
 
-        /*
-            Например -30 лучше, чем -10.
-        */
 
-        score += Math.abs(value) * 5;
+        score +=
+            Math.abs(value) * 10;
+
+
+        if (
+            value <
+            RANGES.cooldown.min
+        ) {
+
+            score -=
+                (
+                    RANGES.cooldown.min -
+                    value
+                ) * 1000000;
+
+        }
 
     }
 
@@ -1044,14 +1269,15 @@ function scoreState(totals, stats) {
    КЛЮЧ СОСТОЯНИЯ
    ========================================================= */
 
-function makeKey(totals, stats) {
+function makeKey(
+    totals,
+    stats
+) {
 
     return stats
-        .map(stat => {
-
-            return `${stat}:${totals[stat] || 0}`;
-
-        })
+        .map(stat =>
+            `${stat}:${totals[stat] || 0}`
+        )
         .join("|");
 
 }
@@ -1061,122 +1287,124 @@ function makeKey(totals, stats) {
    УДАЛЕНИЕ ДУБЛИКАТОВ
    ========================================================= */
 
-function compressStates(states, stats) {
+function compressStates(
+    states,
+    stats
+) {
 
-    const map = new Map();
+    const map =
+        new Map();
+
 
     for (const state of states) {
 
         const key =
-            makeKey(state.totals, stats);
+            makeKey(
+                state.totals,
+                stats
+            );
+
 
         const existing =
             map.get(key);
 
+
         if (!existing) {
 
-            map.set(key, state);
+            map.set(
+                key,
+                state
+            );
 
             continue;
 
         }
 
 
-        /*
-            Если два пути приводят
-            к одинаковым итоговым статам,
-            оставляем путь с лучшим score.
-        */
-
         if (
-            scoreState(state.totals, stats) >
-            scoreState(existing.totals, stats)
+            scoreState(
+                state.totals,
+                stats
+            ) >
+            scoreState(
+                existing.totals,
+                stats
+            )
         ) {
 
-            map.set(key, state);
+            map.set(
+                key,
+                state
+            );
 
         }
 
     }
 
-    return [...map.values()];
+
+    return [
+        ...map.values()
+    ];
 
 }
 
 
 /* =========================================================
-   ДОМИНИРОВАНИЕ
+   УДАЛЕНИЕ СЛАБЫХ СОСТОЯНИЙ
    ========================================================= */
 
-function removeDominated(states, stats) {
+function removeDominated(
+    states,
+    stats
+) {
 
     /*
-        Важно:
+        Сортируем по новой системе приоритетов.
 
-        Мы не сравниваем абсолютно все
-        состояния между собой.
+        В отличие от старой версии,
+        здесь НЕ группируем состояния
+        только по обязательным статам.
 
-        Сначала группируем по обязательным
-        характеристикам.
-
-        Это сильно уменьшает количество
-        состояний.
+        Это важно, потому что теперь
+        атака и урон крита имеют
+        главный приоритет.
     */
 
-    const groups = new Map();
-
-
-    for (const state of states) {
-
-        const key = stats
-            .filter(stat =>
-                stat === "crit" ||
-                stat === "penetration" ||
-                stat === "accuracy" ||
-                stat === "critDamage"
+    states.sort(
+        (a, b) =>
+            scoreState(
+                b.totals,
+                stats
+            ) -
+            scoreState(
+                a.totals,
+                stats
             )
-            .map(stat =>
-                `${stat}:${state.totals[stat] || 0}`
-            )
-            .join("|");
+    );
 
 
-        if (!groups.has(key)) {
-            groups.set(key, []);
-        }
+    /*
+        Ограничиваем количество состояний,
+        чтобы браузер не получил
+        слишком большую нагрузку.
+    */
 
-        groups.get(key).push(state);
+    const LIMIT = 50000;
+
+
+    if (
+        states.length <= LIMIT
+    ) {
+
+        return states;
 
     }
 
 
-    const result = [];
-
-
-    for (const group of groups.values()) {
-
-        /*
-            Для одинаковых обязательных статов
-            оставляем наиболее выгодное состояние.
-
-            Это безопасно для нашей целевой функции,
-            потому что вторичные характеристики
-            используются как улучшение результата.
-        */
-
-        group.sort(
-            (a, b) =>
-                scoreState(b.totals, stats) -
-                scoreState(a.totals, stats)
-        );
-
-
-        result.push(group[0]);
-
-    }
-
-
-    return result;
+    return states.slice(
+        0,
+        LIMIT
+    );
 
 }
 
@@ -1192,66 +1420,115 @@ function createWorker() {
     "use strict";
 
 
-    const RANGES = ${JSON.stringify(RANGES)};
+    const RANGES =
+        ${JSON.stringify(RANGES)};
 
 
-    function procValue(stat, proc) {
+    const BASE_CRIT =
+        ${BASE_CRIT};
 
-        const value = 3 * (proc + 1);
 
-        if (stat === "cooldown") {
+    function procValue(
+        stat,
+        proc
+    ) {
+
+        const value =
+            3 * (proc + 1);
+
+
+        if (
+            stat === "cooldown"
+        ) {
+
             return -value;
+
         }
+
 
         return value;
 
     }
 
 
-    function generateAssignments(stats, procValues) {
+    function generateAssignments(
+        stats,
+        procValues
+    ) {
 
         const result = [];
 
 
-        for (let a = 0; a < stats.length; a++) {
+        for (
+            let a = 0;
+            a < stats.length;
+            a++
+        ) {
 
-            for (let b = 0; b < stats.length; b++) {
+            for (
+                let b = 0;
+                b < stats.length;
+                b++
+            ) {
 
                 if (a === b) continue;
 
 
-                for (let c = 0; c < stats.length; c++) {
+                for (
+                    let c = 0;
+                    c < stats.length;
+                    c++
+                ) {
 
-                    if (c === a || c === b) continue;
+                    if (
+                        c === a ||
+                        c === b
+                    ) {
+
+                        continue;
+
+                    }
 
 
                     result.push([
 
                         {
                             stat: stats[a],
-                            proc: procValues[0],
-                            value: procValue(
-                                stats[a],
-                                procValues[0]
-                            )
+
+                            proc:
+                                procValues[0],
+
+                            value:
+                                procValue(
+                                    stats[a],
+                                    procValues[0]
+                                )
                         },
 
                         {
                             stat: stats[b],
-                            proc: procValues[1],
-                            value: procValue(
-                                stats[b],
-                                procValues[1]
-                            )
+
+                            proc:
+                                procValues[1],
+
+                            value:
+                                procValue(
+                                    stats[b],
+                                    procValues[1]
+                                )
                         },
 
                         {
                             stat: stats[c],
-                            proc: procValues[2],
-                            value: procValue(
-                                stats[c],
-                                procValues[2]
-                            )
+
+                            proc:
+                                procValues[2],
+
+                            value:
+                                procValue(
+                                    stats[c],
+                                    procValues[2]
+                                )
                         }
 
                     ]);
@@ -1268,15 +1545,24 @@ function createWorker() {
     }
 
 
-    function addAssignment(totals, assignment) {
+    function addAssignment(
+        totals,
+        assignment
+    ) {
 
-        const result = { ...totals };
+        const result = {
+            ...totals
+        };
 
 
-        for (const item of assignment) {
+        for (
+            const item of assignment
+        ) {
 
             result[item.stat] =
-                (result[item.stat] || 0) +
+                (
+                    result[item.stat] || 0
+                ) +
                 item.value;
 
         }
@@ -1287,48 +1573,56 @@ function createWorker() {
     }
 
 
-    function makeKey(totals, stats) {
-
-        return stats
-            .map(stat =>
-                stat + ":" + (totals[stat] || 0)
-            )
-            .join("|");
-
-    }
-
-
     function stateStillPossible(
         totals,
         stats,
         slotsLeft
     ) {
 
-        for (const stat of stats) {
+        for (
+            const stat of stats
+        ) {
 
-            const range = RANGES[stat];
+            const range =
+                RANGES[stat];
+
 
             const current =
                 totals[stat] || 0;
 
 
             const maxPossible =
-                current + slotsLeft * 45;
+                current +
+                slotsLeft * 45;
+
 
             const minPossible =
-                current - slotsLeft * 45;
+                current -
+                slotsLeft * 45;
 
 
-            if (stat !== "cooldown") {
+            if (
+                stat !== "cooldown"
+            ) {
 
-                if (maxPossible < range.min) {
+                if (
+                    maxPossible <
+                    range.min
+                ) {
+
                     return false;
+
                 }
 
             } else {
 
-                if (minPossible > range.max) {
+                if (
+                    minPossible >
+                    range.max
+                ) {
+
                     return false;
+
                 }
 
             }
@@ -1346,54 +1640,124 @@ function createWorker() {
         stats
     ) {
 
-        for (const stat of stats) {
+        for (
+            const stat of stats
+        ) {
 
             const range =
                 RANGES[stat];
+
 
             const value =
                 totals[stat] || 0;
 
 
+            /*
+                Крит.
+            */
+
             if (
-                stat === "crit" ||
+                stat === "crit"
+            ) {
+
+                const finalCrit =
+                    value +
+                    BASE_CRIT;
+
+
+                if (
+                    finalCrit <
+                    range.min ||
+                    finalCrit >
+                    range.max
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            /*
+                Остальные обязательные.
+            */
+
+            if (
                 stat === "penetration" ||
                 stat === "accuracy" ||
                 stat === "critDamage"
             ) {
 
                 if (
-                    value < range.min ||
-                    value > range.max
+                    value <
+                    range.min ||
+                    value >
+                    range.max
                 ) {
+
                     return false;
+
                 }
 
             }
 
 
-            if (stat === "attack") {
+            /*
+                Атака.
+            */
 
-                if (value > range.max) {
+            if (
+                stat === "attack"
+            ) {
+
+                if (
+                    value >
+                    range.max
+                ) {
+
                     return false;
+
                 }
 
             }
 
 
-            if (stat === "meter") {
+            /*
+                Прирост шкалы.
+            */
 
-                if (value > range.max) {
+            if (
+                stat === "meter"
+            ) {
+
+                if (
+                    value >
+                    range.max
+                ) {
+
                     return false;
+
                 }
 
             }
 
 
-            if (stat === "cooldown") {
+            /*
+                Перезарядка.
+            */
 
-                if (value < range.min) {
+            if (
+                stat === "cooldown"
+            ) {
+
+                if (
+                    value <
+                    range.min
+                ) {
+
                     return false;
+
                 }
 
             }
@@ -1406,6 +1770,10 @@ function createWorker() {
     }
 
 
+    /* =====================================================
+       НОВАЯ СИСТЕМА ОЦЕНКИ
+       ===================================================== */
+
     function scoreState(
         totals,
         stats
@@ -1414,91 +1782,257 @@ function createWorker() {
         let score = 0;
 
 
-        if (stats.includes("crit")) {
+        /*
+            АТАКА — главный приоритет.
+        */
 
-            score -=
-                Math.abs(
-                    (totals.crit || 0) -
-                    RANGES.crit.target
-                ) * 100000;
+        if (
+            stats.includes("attack")
+        ) {
 
-        }
-
-
-        if (stats.includes("penetration")) {
-
-            score -=
-                Math.abs(
-                    (totals.penetration || 0) -
-                    RANGES.penetration.target
-                ) * 100000;
+            score +=
+                (
+                    totals.attack || 0
+                ) * 1000;
 
         }
 
 
-        if (stats.includes("accuracy")) {
+        /*
+            УРОН КРИТА — второй главный приоритет.
+        */
 
-            score -=
-                Math.abs(
-                    (totals.accuracy || 0) -
-                    RANGES.accuracy.target
-                ) * 100000;
-
-        }
-
-
-        if (stats.includes("critDamage")) {
+        if (
+            stats.includes("critDamage")
+        ) {
 
             const value =
                 totals.critDamage || 0;
 
 
-            score -=
-                Math.abs(
-                    value -
-                    RANGES.critDamage.target
-                ) * 10000;
+            score +=
+                value * 900;
 
 
             if (
-                value >=
-                RANGES.critDamage.min
+                value >
+                RANGES.critDamage.max
             ) {
 
                 score -=
-                    Math.max(
-                        0,
+                    (
                         value -
-                        RANGES.critDamage.target
-                    ) * 100;
+                        RANGES.critDamage.max
+                    ) * 1000000;
 
             }
 
         }
 
 
-        if (stats.includes("attack")) {
+        /*
+            ШАНС КРИТА — средний приоритет.
+        */
+
+        if (
+            stats.includes("crit")
+        ) {
+
+            const value =
+                totals.crit || 0;
+
 
             score +=
-                (totals.attack || 0) * 50;
+                value * 300;
+
+
+            const finalCrit =
+                value +
+                BASE_CRIT;
+
+
+            if (
+                finalCrit <
+                RANGES.crit.min
+            ) {
+
+                score -=
+                    (
+                        RANGES.crit.min -
+                        finalCrit
+                    ) * 1000000;
+
+            }
+
+
+            if (
+                finalCrit >
+                RANGES.crit.max
+            ) {
+
+                score -=
+                    (
+                        finalCrit -
+                        RANGES.crit.max
+                    ) * 1000000;
+
+            }
 
         }
 
 
-        if (stats.includes("meter")) {
+        /*
+            ПРОНИЦАНИЕ — низкий приоритет.
+        */
+
+        if (
+            stats.includes("penetration")
+        ) {
+
+            const value =
+                totals.penetration || 0;
+
 
             score +=
-                (totals.meter || 0) * 5;
+                value * 50;
+
+
+            if (
+                value <
+                RANGES.penetration.min
+            ) {
+
+                score -=
+                    (
+                        RANGES.penetration.min -
+                        value
+                    ) * 1000000;
+
+            }
+
+
+            if (
+                value >
+                RANGES.penetration.max
+            ) {
+
+                score -=
+                    (
+                        value -
+                        RANGES.penetration.max
+                    ) * 1000000;
+
+            }
 
         }
 
 
-        if (stats.includes("cooldown")) {
+        /*
+            ТОЧНОСТЬ.
+        */
+
+        if (
+            stats.includes("accuracy")
+        ) {
+
+            const value =
+                totals.accuracy || 0;
+
 
             score +=
-                Math.abs(
-                    totals.cooldown || 0
-                ) * 5;
+                value * 20;
+
+
+            if (
+                value <
+                RANGES.accuracy.min
+            ) {
+
+                score -=
+                    (
+                        RANGES.accuracy.min -
+                        value
+                    ) * 1000000;
+
+            }
+
+
+            if (
+                value >
+                RANGES.accuracy.max
+            ) {
+
+                score -=
+                    (
+                        value -
+                        RANGES.accuracy.max
+                    ) * 1000000;
+
+            }
+
+        }
+
+
+        /*
+            ПРИРОСТ ШКАЛЫ.
+        */
+
+        if (
+            stats.includes("meter")
+        ) {
+
+            const value =
+                totals.meter || 0;
+
+
+            score +=
+                value * 10;
+
+
+            if (
+                value >
+                RANGES.meter.max
+            ) {
+
+                score -=
+                    (
+                        value -
+                        RANGES.meter.max
+                    ) * 1000000;
+
+            }
+
+        }
+
+
+        /*
+            ПЕРЕЗАРЯДКА.
+        */
+
+        if (
+            stats.includes("cooldown")
+        ) {
+
+            const value =
+                totals.cooldown || 0;
+
+
+            score +=
+                Math.abs(value) * 10;
+
+
+            if (
+                value <
+                RANGES.cooldown.min
+            ) {
+
+                score -=
+                    (
+                        RANGES.cooldown.min -
+                        value
+                    ) * 1000000;
+
+            }
 
         }
 
@@ -1508,15 +2042,37 @@ function createWorker() {
     }
 
 
+    function makeKey(
+        totals,
+        stats
+    ) {
+
+        return stats
+            .map(
+                stat =>
+                    stat +
+                    ":" +
+                    (
+                        totals[stat] || 0
+                    )
+            )
+            .join("|");
+
+    }
+
+
     function compressStates(
         states,
         stats
     ) {
 
-        const map = new Map();
+        const map =
+            new Map();
 
 
-        for (const state of states) {
+        for (
+            const state of states
+        ) {
 
             const key =
                 makeKey(
@@ -1531,7 +2087,10 @@ function createWorker() {
 
             if (!existing) {
 
-                map.set(key, state);
+                map.set(
+                    key,
+                    state
+                );
 
                 continue;
 
@@ -1549,14 +2108,19 @@ function createWorker() {
                 )
             ) {
 
-                map.set(key, state);
+                map.set(
+                    key,
+                    state
+                );
 
             }
 
         }
 
 
-        return [...map.values()];
+        return [
+            ...map.values()
+        ];
 
     }
 
@@ -1566,77 +2130,46 @@ function createWorker() {
         stats
     ) {
 
-        const groups = new Map();
-
-
-        for (const state of states) {
-
-            const key = stats
-                .filter(stat =>
-                    stat === "crit" ||
-                    stat === "penetration" ||
-                    stat === "accuracy" ||
-                    stat === "critDamage"
+        states.sort(
+            (a, b) =>
+                scoreState(
+                    b.totals,
+                    stats
+                ) -
+                scoreState(
+                    a.totals,
+                    stats
                 )
-                .map(stat =>
-                    stat +
-                    ":" +
-                    (state.totals[stat] || 0)
-                )
-                .join("|");
+        );
 
 
-            if (!groups.has(key)) {
-                groups.set(key, []);
-            }
+        const LIMIT =
+            50000;
 
 
-            groups
-                .get(key)
-                .push(state);
+        if (
+            states.length <= LIMIT
+        ) {
+
+            return states;
 
         }
 
 
-        const result = [];
-
-
-        for (const group of groups.values()) {
-
-            let best = group[0];
-
-
-            for (let i = 1; i < group.length; i++) {
-
-                if (
-                    scoreState(
-                        group[i].totals,
-                        stats
-                    ) >
-                    scoreState(
-                        best.totals,
-                        stats
-                    )
-                ) {
-
-                    best = group[i];
-
-                }
-
-            }
-
-
-            result.push(best);
-
-        }
-
-
-        return result;
+        return states.slice(
+            0,
+            LIMIT
+        );
 
     }
 
 
-    self.onmessage = function(event) {
+    /* =====================================================
+       ЗАПУСК WORKER
+       ===================================================== */
+
+    self.onmessage =
+        function(event) {
 
         try {
 
@@ -1653,8 +2186,8 @@ function createWorker() {
 
 
             /*
-                Генерируем 210 максимум
-                вариантов для каждого слота.
+                Генерируем варианты
+                для каждого слота.
             */
 
             const assignments =
@@ -1682,10 +2215,7 @@ function createWorker() {
 
 
             /*
-                Последовательно обрабатываем
-                5 слотов.
-
-                Здесь НЕТ 210^5.
+                Обрабатываем 5 слотов.
             */
 
             for (
@@ -1694,8 +2224,7 @@ function createWorker() {
                 slotIndex++
             ) {
 
-                const next =
-                    [];
+                const next = [];
 
 
                 for (
@@ -1721,7 +2250,8 @@ function createWorker() {
 
 
                         const slotsLeft =
-                            4 - slotIndex;
+                            4 -
+                            slotIndex;
 
 
                         if (
@@ -1740,6 +2270,7 @@ function createWorker() {
                         next.push({
 
                             totals,
+
                             slots
 
                         });
@@ -1750,7 +2281,8 @@ function createWorker() {
 
 
                 /*
-                    Удаляем одинаковые состояния.
+                    Удаляем одинаковые
+                    состояния.
                 */
 
                 states =
@@ -1761,7 +2293,7 @@ function createWorker() {
 
 
                 /*
-                    Удаляем заведомо худшие
+                    Оставляем лучшие
                     состояния.
                 */
 
@@ -1788,12 +2320,14 @@ function createWorker() {
 
 
             /*
-                Ищем финальные допустимые состояния.
+                Ищем лучший финальный вариант.
             */
 
-            let best = null;
+            let best =
+                null;
 
-            let bestScore = -Infinity;
+            let bestScore =
+                -Infinity;
 
 
             for (
@@ -1820,7 +2354,8 @@ function createWorker() {
 
 
                 if (
-                    score > bestScore
+                    score >
+                    bestScore
                 ) {
 
                     bestScore =
@@ -1838,7 +2373,8 @@ function createWorker() {
 
                 type: "done",
 
-                result: best
+                result:
+                    best
 
             });
 
@@ -1870,7 +2406,8 @@ function createWorker() {
         new Blob(
             [workerCode],
             {
-                type: "application/javascript"
+                type:
+                    "application/javascript"
             }
         );
 
@@ -1888,11 +2425,14 @@ function createWorker() {
 
 function startCalculation() {
 
-    validationError.textContent = "";
+    validationError.textContent =
+        "";
 
-    result.style.display = "none";
+    result.style.display =
+        "none";
 
-    progress.textContent = "";
+    progress.textContent =
+        "";
 
 
     const validation =
@@ -1917,7 +2457,9 @@ function startCalculation() {
         getProcs();
 
 
-    calculateButton.disabled = true;
+    calculateButton.disabled =
+        true;
+
 
     calculateButton.textContent =
         "Идёт расчёт...";
@@ -1941,7 +2483,8 @@ function startCalculation() {
 
                 progress.textContent =
                     `Обработан слот ${data.slot}/5. ` +
-                    `Состояний: ${data.states.toLocaleString("ru-RU")}`;
+                    `Состояний: ` +
+                    `${data.states.toLocaleString("ru-RU")}`;
 
                 return;
 
@@ -2031,6 +2574,7 @@ function startCalculation() {
 
             worker.terminate();
 
+
             console.error(error);
 
         };
@@ -2063,12 +2607,14 @@ function showResult(
     let html = "";
 
 
-    html += "<h3>Распределение характеристик</h3>";
+    html +=
+        "<h3>Распределение характеристик</h3>";
 
 
     for (
         let slotIndex = 0;
-        slotIndex < solution.slots.length;
+        slotIndex <
+        solution.slots.length;
         slotIndex++
     ) {
 
@@ -2084,7 +2630,8 @@ function showResult(
 
         for (
             let cellIndex = 0;
-            cellIndex < slot.length;
+            cellIndex <
+            slot.length;
             cellIndex++
         ) {
 
@@ -2094,6 +2641,7 @@ function showResult(
 
             html += `
                 <div class="result-stat">
+
                     <span>
                         Ячейка ${cellIndex + 1}:
                         <strong>
@@ -2105,48 +2653,52 @@ function showResult(
                         ${item.proc} проков
                         (${formatPercent(item.value)})
                     </span>
+
                 </div>
             `;
 
         }
 
 
-        html += "</div>";
+        html +=
+            "</div>";
 
     }
 
 
-    html += "<h3>Итоговые характеристики</h3>";
+    html +=
+        "<h3>Итоговые характеристики</h3>";
 
 
     const totals =
         solution.totals;
 
 
-    /*
-        Выводим только выбранные характеристики.
-    */
-
-    for (const stat of stats) {
+    for (
+        const stat of stats
+    ) {
 
         let value =
             totals[stat] || 0;
 
 
         /*
-            К базовому криту добавляем
-            20% персонажа.
+            Добавляем базовый крит.
         */
 
-        if (stat === "crit") {
+        if (
+            stat === "crit"
+        ) {
 
-            value += BASE_CRIT;
+            value +=
+                BASE_CRIT;
 
         }
 
 
         html += `
             <div class="result-stat total-row">
+
                 <span>
                     ${STAT_NAMES[stat]}
                 </span>
@@ -2154,6 +2706,7 @@ function showResult(
                 <span>
                     ${formatPercent(value)}
                 </span>
+
             </div>
         `;
 
@@ -2174,7 +2727,7 @@ function showResult(
 
 
 /* =========================================================
-   РАСЧЁТ НЕИСПОЛЬЗОВАННОЙ СТАТЫ
+   ИСПОЛЬЗОВАНИЕ СТАТЫ
    ========================================================= */
 
 function calculateUnused(
@@ -2183,33 +2736,17 @@ function calculateUnused(
     procs
 ) {
 
-    /*
-        Всего проковых единиц:
-
-        5 слотов * 14 = 70.
-    */
-
     const totalProcPool =
         5 * 14;
 
-
-    /*
-        Каждая ячейка использует
-        один проковый показатель.
-
-        Здесь считаем именно
-        "свободные места по значениям проков".
-
-        Поскольку характеристики получают
-        фиксированные проки, итоговое число
-        всегда определяется назначением.
-    */
 
     let usedProc =
         0;
 
 
-    for (const slot of procs) {
+    for (
+        const slot of procs
+    ) {
 
         usedProc +=
             slot[0] +
@@ -2219,116 +2756,54 @@ function calculateUnused(
     }
 
 
-    /*
-        Все 70 проков фактически распределены.
-
-        Поэтому свободная стата — это не
-        "неиспользованные проковые ячейки",
-        а запас относительно полезных диапазонов.
-
-        Считаем запас для обязательных статов.
-    */
-
-    let useful = 0;
-
-
-    for (const stat of stats) {
-
-        const range =
-            RANGES[stat];
-
-
-        let value =
-            totals[stat] || 0;
-
-
-        if (stat === "crit") {
-
-            value += BASE_CRIT;
-
-        }
-
-
-        if (
-            stat === "crit" ||
-            stat === "penetration" ||
-            stat === "accuracy" ||
-            stat === "critDamage"
-        ) {
-
-            if (value > range.max) {
-
-                useful +=
-                    range.max;
-
-            } else {
-
-                useful +=
-                    value;
-
-            }
-
-        }
-
-        else if (stat === "attack") {
-
-            useful +=
-                Math.min(
-                    value,
-                    range.max
-                );
-
-        }
-
-        else if (stat === "meter") {
-
-            useful +=
-                Math.min(
-                    value,
-                    range.max
-                );
-
-        }
-
-        else if (stat === "cooldown") {
-
-            useful +=
-                Math.min(
-                    Math.abs(value),
-                    Math.abs(range.min)
-                );
-
-        }
-
-    }
-
-
     return `
         <div class="unused">
 
-            <strong>Использование статы</strong>
+            <strong>
+                Использование статы
+            </strong>
 
             <div class="result-stat">
-                <span>Проковый пул</span>
-                <span>${totalProcPool}</span>
+
+                <span>
+                    Проковый пул
+                </span>
+
+                <span>
+                    ${totalProcPool}
+                </span>
+
             </div>
 
             <div class="result-stat">
-                <span>Распределено проков</span>
-                <span>${usedProc}</span>
+
+                <span>
+                    Распределено проков
+                </span>
+
+                <span>
+                    ${usedProc}
+                </span>
+
             </div>
 
             <div class="result-stat">
-                <span>Ячеек</span>
-                <span>15 / 15</span>
+
+                <span>
+                    Ячеек
+                </span>
+
+                <span>
+                    15 / 15
+                </span>
+
             </div>
 
             <p>
-                Все 15 ячеек заполнены.
-                Дополнительная свободная стата
-                определяется тем, насколько близко
-                обязательные характеристики находятся
-                к своим целевым значениям.
+                Большие проки приоритетно
+                направляются в атаку и урон крита.
+                Средние — в шанс крита.
+                Маленькие и остаток — в проницание.
             </p>
 
         </div>
@@ -2343,11 +2818,14 @@ function calculateUnused(
 
 function formatPercent(value) {
 
-    if (value > 0) {
+    if (
+        value > 0
+    ) {
 
         return `+${value}%`;
 
     }
+
 
     return `${value}%`;
 
@@ -2355,7 +2833,7 @@ function formatPercent(value) {
 
 
 /* =========================================================
-   ОБНОВЛЕНИЕ БЛОКА ИСПОЛЬЗОВАНИЯ СТАТЫ
+   ОБНОВЛЕНИЕ ИСПОЛЬЗОВАНИЯ
    ========================================================= */
 
 function updateUsage() {
@@ -2372,7 +2850,9 @@ function updateUsage() {
         0;
 
 
-    for (const slot of procs) {
+    for (
+        const slot of procs
+    ) {
 
         total +=
             slot[0] +
@@ -2481,4 +2961,3 @@ updateUsage();
 
 </body>
 </html>
-
