@@ -1,0 +1,4412 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Калькулятор характеристик</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: #111827;
+    color: #f3f4f6;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 1150px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+h3 {
+    margin-top: 0;
+}
+
+.card {
+    background: #1f2937;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* =========================================================
+   ВЫБОР ХАРАКТЕРИСТИК
+   ========================================================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+}
+
+.stat {
+    background: #111827;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.stat label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* =========================================================
+   ЦЕЛИ
+   ========================================================= */
+
+.targets-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(210px, 1fr));
+    gap: 10px;
+}
+
+.target-card {
+    background: #111827;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.target-card.disabled {
+    opacity: 0.45;
+}
+
+.target-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.target-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.target-input {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #374151;
+    border-radius: 7px;
+    background: #1f2937;
+    color: white;
+    font-size: 16px;
+}
+
+.target-input:focus {
+    outline: 2px solid #2563eb;
+}
+
+.target-unit {
+    color: #9ca3af;
+}
+
+/* =========================================================
+   ОБЫЧНЫЕ СЛОТЫ
+   ========================================================= */
+
+.proc-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(5, minmax(120px, 1fr));
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.slot {
+    min-width: 120px;
+    background: #111827;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.slot-title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.proc-cell {
+    width: 100%;
+    padding: 9px;
+    margin-bottom: 8px;
+    border: 1px solid #374151;
+    border-radius: 7px;
+    background: #1f2937;
+    color: white;
+    text-align: center;
+    font-size: 16px;
+}
+
+.proc-cell:focus {
+    outline: 2px solid #2563eb;
+}
+
+.proc-cell::placeholder {
+    color: #9ca3af;
+}
+
+.proc-sum {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.proc-sum.ok {
+    color: #4ade80;
+}
+
+.proc-sum.bad {
+    color: #f87171;
+}
+
+/* =========================================================
+   ПРИГЛАШЁННАЯ ЗВЕЗДА
+   ========================================================= */
+
+.invited-star {
+    margin-top: 25px;
+    padding: 18px;
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #21143f,
+            #17122e
+        );
+
+    border: 2px solid #7c3aed;
+
+    box-shadow:
+        0 0 18px rgba(
+            124,
+            58,
+            237,
+            0.18
+        );
+}
+
+.invited-star-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.invited-star-title {
+    color: #c4b5fd;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.invited-star-subtitle {
+    margin-top: 6px;
+    color: #a78bfa;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.invited-star-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.invited-star-slot {
+    background: #111827;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #6d28d9;
+}
+
+.invited-star-cell {
+    width: 100%;
+    padding: 9px;
+
+    border: 1px solid #7c3aed;
+    border-radius: 7px;
+
+    background: #1f2937;
+    color: white;
+
+    text-align: center;
+    font-size: 16px;
+}.invited-star-cell:focus {
+    outline: 2px solid #a78bfa;
+}
+
+.invited-star-cell::placeholder {
+    color: #9ca3af;
+}
+
+.invited-star-sum {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.invited-star-sum.ok {
+    color: #4ade80;
+}
+
+.invited-star-sum.bad {
+    color: #f87171;
+}
+
+.invited-star-zero {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* =========================================================
+   КНОПКИ
+   ========================================================= */
+
+button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+button:disabled {
+    background: #4b5563;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   ПРОГРЕСС
+   ========================================================= */
+
+.progress {
+    margin-top: 15px;
+    text-align: center;
+    color: #93c5fd;
+    min-height: 20px;
+}
+
+/* =========================================================
+   РЕЗУЛЬТАТ
+   ========================================================= */
+
+.result {
+    display: none;
+}
+
+.result-slot {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #111827;
+    border-radius: 10px;
+}
+
+.invited-star-result {
+    border: 2px solid #7c3aed;
+
+    background:
+        linear-gradient(
+            135deg,
+            #21143f,
+            #17122e
+        );
+}
+
+.invited-star-result h3 {
+    color: #c4b5fd;
+}
+
+.result-stat {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 7px 0;
+    border-bottom: 1px solid #374151;
+}
+
+.result-stat:last-child {
+    border-bottom: none;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(230px, 1fr));
+    gap: 10px;
+}
+
+.summary-card {
+    background: #111827;
+    padding: 14px;
+    border-radius: 10px;
+}
+
+.summary-card strong {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.big-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.good {
+    color: #4ade80;
+}
+
+.warning {
+    color: #facc15;
+}
+
+.bad {
+    color: #f87171;
+}
+
+.info {
+    color: #93c5fd;
+}
+
+.small {
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.5;
+}
+
+.unused {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #172554;
+}
+
+.error {
+    color: #f87171;
+    margin-top: 10px;
+}
+
+.success {
+    color: #4ade80;
+    margin-top: 10px;
+}
+
+.loss-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.loss-table th,
+.loss-table td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #374151;
+}
+
+.loss-table th {
+    color: #93c5fd;
+}
+
+.search-mode {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #172554;
+    color: #bfdbfe;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   МОБИЛЬНАЯ ВЕРСИЯ
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 14px;
+    }
+
+    .proc-grid {
+        grid-template-columns:
+            repeat(5, 105px);
+    }
+
+    .invited-star-grid {
+        grid-template-columns:
+            repeat(3, 105px);
+
+        overflow-x: auto;
+    }
+
+    .result-stat {
+        font-size: 14px;
+    }
+
+    .loss-table {
+        font-size: 13px;
+    }
+
+}
+
+
+
+/* Skullgirls Mobile-inspired compact interface refresh */
+:root { color-scheme: dark; --sg-bg:#101014; --sg-panel:#1c1b22; --sg-panel2:#25232c; --sg-red:#e84a5f; --sg-gold:#e8bd62; --sg-line:#49404a; }
+body { padding: clamp(10px, 2.4vw, 28px); background: radial-gradient(ellipse at top, #30202a 0%, #17151c 38%, #0d0d11 100%); color:#f8f3ed; font-family: Inter, "Segoe UI", Arial, sans-serif; }
+.container { max-width:1180px; }
+h1 { text-transform:uppercase; letter-spacing:.09em; font-size:clamp(1.35rem,3vw,2.15rem); color:#fff5e7; text-shadow:0 2px 0 #7d2534; margin:8px 0 22px; }
+h2 { font-size:1.02rem; text-transform:uppercase; letter-spacing:.075em; color:var(--sg-gold); border-bottom:1px solid #59404a; padding-bottom:10px; margin-bottom:15px; }
+.card { background:linear-gradient(145deg,rgba(37,34,43,.98),rgba(23,22,28,.98)); border:1px solid #453741; border-radius:12px; padding:clamp(13px,2vw,22px); margin-bottom:14px; box-shadow:0 8px 22px #0004; }
+.stats-grid { grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px; }
+.stat,.target-card,.slot { background:linear-gradient(160deg,#292630,#1a1920); border:1px solid #443b47; border-radius:9px; }
+.stat { padding:10px 12px; transition:border-color .15s,background .15s; }
+.stat:has(input:checked) { border-color:#b9475a; background:linear-gradient(145deg,#38232c,#211c25); }
+input[type="checkbox"] { accent-color:var(--sg-red); width:16px; height:16px; }
+.targets-grid { grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:8px; }
+.target-card { padding:10px; }
+.target-title,.slot-title { font-size:.9rem; letter-spacing:.025em; }
+.target-input,.proc-cell,.invited-star-cell,select { width:100%; min-width:0; border:1px solid #504653; border-radius:7px; background:#111116; color:#fff7ed; padding:10px; font-size:15px; outline:none; }
+.target-input:focus,.proc-cell:focus,.invited-star-cell:focus,select:focus { border-color:var(--sg-gold); box-shadow:0 0 0 2px #e8bd6225; outline:none; }
+.target-unit,.small,.level-info,.invited-star-zero { color:#b9aeb9; }
+.proc-grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:9px; overflow:visible; }
+.slot { min-width:0; padding:10px; }
+.slot-title { color:#fff1e7; text-transform:uppercase; font-weight:800; margin-bottom:9px; }
+.level-select { margin-bottom:7px; font-size:13px; padding:9px 7px; }
+.level-info { font-size:11px; text-align:center; margin:0 0 9px; }
+.proc-cell { margin-bottom:7px; text-align:center; padding:9px 5px; }
+.proc-sum { font-size:12px; margin-top:7px; color:#cfc3cf; }
+.proc-sum.ok,.invited-star-sum.ok { color:#8be0a0; }
+.proc-sum.bad,.invited-star-sum.bad { color:#ff7885; }
+.invited-star { margin-top:14px; padding:15px; border-radius:12px; background:linear-gradient(140deg,#30202f,#1c1926); border:1px solid #a24b75; box-shadow:0 0 0 1px #e84a5f18,0 10px 24px #0003; }
+.invited-star-title { color:#f1c8d8; text-transform:uppercase; letter-spacing:.06em; font-size:1.05rem; }
+.invited-star-subtitle { color:#c5a6bc; font-size:12px; margin-top:5px; }
+.invited-star-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+.invited-star-slot { padding:8px; border-radius:8px; background:#17141d; border:1px solid #70435f; }
+.invited-star-cell { text-align:center; border-color:#624054; }
+button { background:linear-gradient(180deg,#f05b69,#b92d48); border:1px solid #ff8790; border-radius:8px; padding:14px; color:white; text-transform:uppercase; letter-spacing:.055em; font-size:14px; box-shadow:0 4px 0 #752235,0 8px 16px #0003; transition:filter .15s,transform .15s; }
+button:hover { background:linear-gradient(180deg,#ff6b77,#c73751); filter:brightness(1.05); }
+button:active { transform:translateY(2px); box-shadow:0 2px 0 #752235; }
+.progress { color:var(--sg-gold); font-size:13px; }
+.result-slot,.summary-card { background:#17161d; border:1px solid #443b47; border-radius:9px; }
+.result-stat { border-color:#3c3540; }
+.loss-table th { color:var(--sg-gold); }
+.search-mode,.unused { background:#28212e; border:1px solid #4c3b52; border-radius:8px; }
+@media(max-width:800px) { .proc-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .slot { min-width:0; } }
+@media(max-width:480px) { body { padding:8px; } h1 { letter-spacing:.04em; } .proc-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .invited-star-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .invited-star-cell { padding:8px 3px; } }
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>
+    Калькулятор характеристик
+</h1>
+
+<!-- =====================================================
+     ВЫБОР ХАРАКТЕРИСТИК
+     ===================================================== -->
+
+<div class="card">
+
+<h2>
+    Выбор характеристик
+</h2>
+
+<div class="stats-grid">
+
+<div class="stat">
+<label>
+<input
+    type="checkbox"
+    class="stat-check"
+    value="crit"
+    checked
+>
+Шанс крита
+</label>
+</div><div class="stat">
+<label>
+<input
+    type="checkbox"
+    class="stat-check"
+    value="penetration"
+    checked
+>
+Проницание
+</label>
+</div>
+
+<div class="stat">
+<label>
+<input
+    type="checkbox"
+    class="stat-check"
+    value="accuracy"
+    checked
+>
+Точность
+</label>
+</div>
+
+<div class="stat">
+<label>
+<input
+    type="checkbox"
+    class="stat-check"
+    value="critDamage"
+    checked
+>
+Урон крита
+</label>
+</div>
+
+<div class="stat">
+<label>
+<input
+    type="checkbox"
+    class="stat-check"
+    value="attack"
+    checked
+>
+Атака
+</label>
+</div>
+
+<div class="stat">
+<label>
+<input
+    type="checkbox"
+    class="stat-check"
+    value="meter"
+    checked
+>
+Прирост шкалы
+</label>
+</div>
+
+<div class="stat">
+<label>
+<input
+    type="checkbox"
+    class="stat-check"
+    value="moveCooldown"
+>
+Перезарядка приёмов
+</label>
+</div>
+
+<div class="stat">
+<label>
+<input
+    type="checkbox"
+    class="stat-check"
+    value="tagCooldown"
+>
+Перезарядка призыва
+</label>
+</div>
+
+</div>
+
+</div>
+
+<!-- =====================================================
+     ЦЕЛИ
+     ===================================================== -->
+
+<div class="card">
+
+<h2>
+    Цели характеристик
+</h2>
+
+
+
+<div
+    id="targetsGrid"
+    class="targets-grid"
+></div>
+
+</div>
+
+<!-- =====================================================
+     ПРОКИ
+     ===================================================== -->
+
+<div class="card">
+
+<h2>
+    Проки
+</h2>
+
+
+
+<div class="proc-grid">
+
+<div class="slot">
+
+<div class="slot-title">
+    Слот 1
+</div>
+
+<select class="level-select proc-level" data-slot-level="0">
+    <option value="1">1 ур. · 0</option>
+    <option value="2">2 ур. · 1</option>
+    <option value="3">3 ур. · 2</option>
+    <option value="4">4 ур. · 3</option>
+    <option value="5">5 ур. · 4</option>
+    <option value="6">6 ур. · 5</option>
+    <option value="7">7 ур. · 6</option>
+    <option value="8">8 ур. · 7</option>
+    <option value="9">9 ур. · 8</option>
+    <option value="10">10 ур. · 9</option>
+    <option value="11">11 ур. · 10</option>
+    <option value="12">12 ур. · 11</option>
+    <option value="13">13 ур. · 12</option>
+    <option value="14">14 ур. · 13</option>
+    <option value="15" selected>15 ур. · 14</option>
+</select>
+
+<div class="level-info">Лимит: <span class="slot-level-procs">14</span></div>
+
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 1" data-slot="0">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 2" data-slot="0">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 3" data-slot="0">
+
+<div class="proc-sum">
+    Сумма: <span>0</span>
+</div>
+
+</div>
+
+<div class="slot">
+
+<div class="slot-title">
+    Слот 2
+</div>
+
+<select class="level-select proc-level" data-slot-level="1">
+    <option value="1">1 ур. · 0</option>
+    <option value="2">2 ур. · 1</option>
+    <option value="3">3 ур. · 2</option>
+    <option value="4">4 ур. · 3</option>
+    <option value="5">5 ур. · 4</option>
+    <option value="6">6 ур. · 5</option>
+    <option value="7">7 ур. · 6</option>
+    <option value="8">8 ур. · 7</option>
+    <option value="9">9 ур. · 8</option>
+    <option value="10">10 ур. · 9</option>
+    <option value="11">11 ур. · 10</option>
+    <option value="12">12 ур. · 11</option>
+    <option value="13">13 ур. · 12</option>
+    <option value="14">14 ур. · 13</option>
+    <option value="15" selected>15 ур. · 14</option>
+</select>
+
+<div class="level-info">Лимит: <span class="slot-level-procs">14</span></div>
+
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 1" data-slot="1">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 2" data-slot="1">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 3" data-slot="1">
+
+<div class="proc-sum">
+    Сумма: <span>0</span>
+</div>
+
+</div>
+
+<div class="slot">
+
+<div class="slot-title">
+    Слот 3
+</div>
+
+<select class="level-select proc-level" data-slot-level="2">
+    <option value="1">1 ур. · 0</option>
+    <option value="2">2 ур. · 1</option>
+    <option value="3">3 ур. · 2</option>
+    <option value="4">4 ур. · 3</option>
+    <option value="5">5 ур. · 4</option>
+    <option value="6">6 ур. · 5</option>
+    <option value="7">7 ур. · 6</option>
+    <option value="8">8 ур. · 7</option>
+    <option value="9">9 ур. · 8</option>
+    <option value="10">10 ур. · 9</option>
+    <option value="11">11 ур. · 10</option>
+    <option value="12">12 ур. · 11</option>
+    <option value="13">13 ур. · 12</option>
+    <option value="14">14 ур. · 13</option>
+    <option value="15" selected>15 ур. · 14</option>
+</select>
+
+<div class="level-info">Лимит: <span class="slot-level-procs">14</span></div>
+
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 1" data-slot="2">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 2" data-slot="2">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 3" data-slot="2">
+
+<div class="proc-sum">
+    Сумма: <span>0</span>
+</div>
+
+</div>
+
+<div class="slot">
+
+<div class="slot-title">
+    Слот 4
+</div>
+
+<select class="level-select proc-level" data-slot-level="3">
+    <option value="1">1 ур. · 0</option>
+    <option value="2">2 ур. · 1</option>
+    <option value="3">3 ур. · 2</option>
+    <option value="4">4 ур. · 3</option>
+    <option value="5">5 ур. · 4</option>
+    <option value="6">6 ур. · 5</option>
+    <option value="7">7 ур. · 6</option>
+    <option value="8">8 ур. · 7</option>
+    <option value="9">9 ур. · 8</option>
+    <option value="10">10 ур. · 9</option>
+    <option value="11">11 ур. · 10</option>
+    <option value="12">12 ур. · 11</option>
+    <option value="13">13 ур. · 12</option>
+    <option value="14">14 ур. · 13</option>
+    <option value="15" selected>15 ур. · 14</option>
+</select>
+
+<div class="level-info">Лимит: <span class="slot-level-procs">14</span></div>
+
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 1" data-slot="3">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 2" data-slot="3">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 3" data-slot="3">
+
+<div class="proc-sum">
+    Сумма: <span>0</span>
+</div>
+
+</div>
+
+<div class="slot">
+
+<div class="slot-title">
+    Слот 5
+</div>
+
+<select class="level-select proc-level" data-slot-level="4">
+    <option value="1">1 ур. · 0</option>
+    <option value="2">2 ур. · 1</option>
+    <option value="3">3 ур. · 2</option>
+    <option value="4">4 ур. · 3</option>
+    <option value="5">5 ур. · 4</option>
+    <option value="6">6 ур. · 5</option>
+    <option value="7">7 ур. · 6</option>
+    <option value="8">8 ур. · 7</option>
+    <option value="9">9 ур. · 8</option>
+    <option value="10">10 ур. · 9</option>
+    <option value="11">11 ур. · 10</option>
+    <option value="12">12 ур. · 11</option>
+    <option value="13">13 ур. · 12</option>
+    <option value="14">14 ур. · 13</option>
+    <option value="15" selected>15 ур. · 14</option>
+</select>
+
+<div class="level-info">Лимит: <span class="slot-level-procs">14</span></div>
+
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 1" data-slot="4">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 2" data-slot="4">
+<input class="proc-cell" type="number" min="0" max="14" step="1" placeholder="Прок 3" data-slot="4">
+
+<div class="proc-sum">
+    Сумма: <span>0</span>
+</div>
+
+</div>
+
+</div><!-- =====================================================
+     ПРИГЛАШЁННАЯ ЗВЕЗДА
+     ===================================================== -->
+
+<div class="invited-star">
+
+<div class="invited-star-header">
+
+<div class="invited-star-title">
+    ★ Приглашённая звезда
+</div>
+
+<div class="invited-star-subtitle">Три характеристики · уровни 1–20</div>
+
+</div>
+
+<select id="invitedStarLevel" class="level-select">
+    <option value="1">1 ур. · 0</option>
+    <option value="2">2 ур. · 1</option>
+    <option value="3">3 ур. · 2</option>
+    <option value="4">4 ур. · 3</option>
+    <option value="5">5 ур. · 4</option>
+    <option value="6">6 ур. · 5</option>
+    <option value="7">7 ур. · 6</option>
+    <option value="8">8 ур. · 7</option>
+    <option value="9">9 ур. · 8</option>
+    <option value="10">10 ур. · 9</option>
+    <option value="11">11 ур. · 10</option>
+    <option value="12">12 ур. · 11</option>
+    <option value="13">13 ур. · 12</option>
+    <option value="14">14 ур. · 13</option>
+    <option value="15">15 ур. · 14</option>
+    <option value="16">16 ур. · 15</option>
+    <option value="17">17 ур. · 16</option>
+    <option value="18">18 ур. · 17</option>
+    <option value="19">19 ур. · 18</option>
+    <option value="20" selected>20 ур. · 19</option>
+</select>
+
+<div class="level-info">Лимит: <span id="invitedStarLevelProcs">19</span></div>
+
+<div class="invited-star-grid">
+
+<div class="invited-star-slot">
+
+<input
+    class="invited-star-cell"
+    type="number"
+    min="0"
+    max="19"
+    step="1"
+    placeholder="Прок 1"
+    data-invited-slot="0"
+>
+
+</div>
+
+<div class="invited-star-slot">
+
+<input
+    class="invited-star-cell"
+    type="number"
+    min="0"
+    max="19"
+    step="1"
+    placeholder="Прок 2"
+    data-invited-slot="1"
+>
+
+</div>
+
+<div class="invited-star-slot">
+
+<input
+    class="invited-star-cell"
+    type="number"
+    min="0"
+    max="19"
+    step="1"
+    placeholder="Прок 3"
+    data-invited-slot="2"
+>
+
+</div>
+
+</div>
+
+<div
+    id="invitedStarSum"
+    class="invited-star-sum bad"
+>
+    Сумма:
+    <span>0</span>
+    / 19
+</div>
+
+<div
+    id="invitedStarZero"
+    class="invited-star-zero"
+>
+    Нулевых проков:
+    <span>3</span>
+    / максимум 1
+</div>
+
+</div>
+
+<div
+    id="validationError"
+    class="error"
+></div>
+
+</div>
+
+<!-- =====================================================
+     ИСПОЛЬЗОВАНИЕ
+     ===================================================== -->
+
+<div class="card">
+
+<h2>
+    Использование статы
+</h2>
+
+<div id="usage"></div>
+
+</div>
+
+<!-- =====================================================
+     РАСЧЁТ
+     ===================================================== -->
+
+<div class="card">
+
+<button id="calculateButton">
+    Рассчитать оптимальную комбинацию
+</button>
+
+<div
+    id="progress"
+    class="progress"
+    aria-live="polite"
+></div>
+
+</div>
+
+<!-- =====================================================
+     РЕЗУЛЬТАТ
+     ===================================================== -->
+
+<div
+    class="card result"
+    id="result"
+>
+
+<h2>
+    Результат
+</h2>
+
+<div id="resultContent"></div>
+
+</div>
+
+</div>
+
+<script>
+
+"use strict";
+
+/* =========================================================
+   НАЗВАНИЯ
+   ========================================================= */
+
+const STAT_NAMES = {
+
+    crit:
+        "Шанс крита",
+
+    penetration:
+        "Проницание",
+
+    accuracy:
+        "Точность",
+
+    critDamage:
+        "Урон крита",
+
+    attack:
+        "Атака",
+
+    meter:
+        "Прирост шкалы",
+
+    moveCooldown:
+        "Перезарядка приёмов",
+
+    tagCooldown:
+        "Перезарядка призыва"
+
+};
+
+
+/* =========================================================
+   ЦЕЛИ ПО УМОЛЧАНИЮ
+   ========================================================= */
+
+const DEFAULT_TARGETS = {
+
+    crit: 100,
+
+    penetration: 50,
+
+    accuracy: 50,
+
+    critDamage: 130,
+
+    attack: 225,
+
+    meter: 100,
+
+    moveCooldown: -50,
+
+    tagCooldown: -50
+
+};
+
+
+/* =========================================================
+   БАЗОВЫЕ ЗНАЧЕНИЯ
+   ========================================================= */
+
+const BASE_VALUES = {
+
+    crit: 20,
+
+    critDamage: 35,
+
+    penetration: 0,
+
+    accuracy: 0,
+
+    attack: 0,
+
+    meter: 0,
+
+    moveCooldown: -15,
+
+    tagCooldown: -15
+
+};
+
+
+/* =========================================================
+   ПЕРЕЗАРЯДКИ
+   ========================================================= */
+
+const COOLDOWN_STATS = [
+
+    "moveCooldown",
+    "tagCooldown"
+
+];
+
+
+/* =========================================================
+   ПРИОРИТЕТ ПРИ РАВЕНСТВЕ
+   ========================================================= */
+
+const TIE_BREAK_PRIORITY = ["attack",
+    "critDamage",
+    "crit",
+    "penetration",
+    "accuracy",
+    "meter",
+    "moveCooldown",
+    "tagCooldown"
+
+];
+
+
+/* =========================================================
+   ЗВЕЗДА
+   ========================================================= */
+
+const NORMAL_MAX_LEVEL = 15;
+const NORMAL_MAX_PROCS = NORMAL_MAX_LEVEL - 1;
+
+const INVITED_STAR_MAX_LEVEL = 20;
+const INVITED_STAR_MAX_PROC = INVITED_STAR_MAX_LEVEL - 1;
+
+const INVITED_STAR_MAX_ZEROS = 1;
+
+
+/* =========================================================
+   ОГРАНИЧЕНИЕ ПОИСКА
+   ========================================================= */
+
+const BEAM_LIMITS = {
+
+    3: 100000,
+
+    4: 100000,
+
+    5: 30000,
+
+    6: 12000,
+
+    7: 6000,
+
+    8: 3000
+
+};
+
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const procCells =
+    [
+        ...document.querySelectorAll(
+            ".proc-cell"
+        )
+    ];
+
+const invitedStarCells =
+    [
+        ...document.querySelectorAll(
+            ".invited-star-cell"
+        )
+    ];
+
+const procLevelSelects =
+    [
+        ...document.querySelectorAll(
+            ".proc-level"
+        )
+    ];
+
+const invitedStarLevelSelect =
+    document.getElementById(
+        "invitedStarLevel"
+    );
+
+function getSlotLevel(slot) {
+    const select = procLevelSelects.find(
+        item => Number(item.dataset.slotLevel) === slot
+    );
+    const level = select ? Number(select.value) : NORMAL_MAX_LEVEL;
+    return Math.max(1, Math.min(NORMAL_MAX_LEVEL, level));
+}
+
+function getSlotTotalProcs(slot) {
+    return getSlotLevel(slot) - 1;
+}
+
+function getInvitedStarLevel() {
+    const level = invitedStarLevelSelect
+        ? Number(invitedStarLevelSelect.value)
+        : INVITED_STAR_MAX_LEVEL;
+    return Math.max(1, Math.min(INVITED_STAR_MAX_LEVEL, level));
+}
+
+function getInvitedStarTotalProcs() {
+    return getInvitedStarLevel() - 1;
+}
+
+function getInvitedStarMaxZeros() {
+    const total = getInvitedStarTotalProcs();
+    return Math.max(INVITED_STAR_MAX_ZEROS, 3 - total);
+}
+
+function updateLevelLimits() {
+    procLevelSelects.forEach(select => {
+        const slot = Number(select.dataset.slotLevel);
+        const total = getSlotTotalProcs(slot);
+        const slotElement = select.closest(".slot");
+        if (slotElement) {
+            const info = slotElement.querySelector(".slot-level-procs");
+            if (info) info.textContent = total;
+            slotElement.querySelectorAll(".proc-cell").forEach(cell => {
+                cell.max = String(total);
+                if (cell.value !== "") {
+                    const value = Math.max(0, Math.min(total, Math.floor(Number(cell.value) || 0)));
+                    cell.value = String(value);
+                }
+            });
+        }
+    });
+
+    const starTotal = getInvitedStarTotalProcs();
+    if (invitedStarLevelSelect) {
+        const info = document.getElementById("invitedStarLevelProcs");
+        if (info) info.textContent = starTotal;
+    }
+    invitedStarCells.forEach(cell => {
+        cell.max = String(starTotal);
+        if (cell.value !== "") {
+            const value = Math.max(0, Math.min(starTotal, Math.floor(Number(cell.value) || 0)));
+            cell.value = String(value);
+        }
+    });
+}
+
+const statChecks =
+    [
+        ...document.querySelectorAll(
+            ".stat-check"
+        )
+    ];
+
+const targetsGrid =
+    document.getElementById(
+        "targetsGrid"
+    );
+
+const calculateButton =
+    document.getElementById(
+        "calculateButton"
+    );
+
+const progress =
+    document.getElementById(
+        "progress"
+    );
+
+const validationError =
+    document.getElementById(
+        "validationError"
+    );
+
+const result =
+    document.getElementById(
+        "result"
+    );
+
+const resultContent =
+    document.getElementById(
+        "resultContent"
+    );
+
+const usage =
+    document.getElementById(
+        "usage"
+    );
+
+
+/* =========================================================
+   СОЗДАНИЕ ПАНЕЛИ ЦЕЛЕЙ
+   ========================================================= */
+
+function createTargetsPanel() {
+
+    targetsGrid.innerHTML = "";
+
+    Object.keys(STAT_NAMES).forEach(stat => {
+        const enabled = getEnabledStats().includes(stat);
+        const card = document.createElement("div");
+        card.className = "target-card" + (enabled ? "" : " disabled");
+        card.dataset.stat = stat;
+
+        const isCooldown = COOLDOWN_STATS.includes(stat);
+        card.innerHTML = `
+            <div class="target-title">${STAT_NAMES[stat]}</div>
+            <div class="target-input-row">
+                <input
+                    class="target-input"
+                    data-target-stat="${stat}"
+                    type="${isCooldown ? "text" : "number"}"
+                    inputmode="${isCooldown ? "text" : "numeric"}"
+                    step="1"
+                    value="${DEFAULT_TARGETS[stat]}"
+                    ${enabled ? "" : "disabled"}
+                >
+                <span class="target-unit">%</span>
+            </div>
+            ${isCooldown ? `<div class="small">База: −15%. Лимит: −50%. Можно вводить отрицательные значения.</div>` : ""}
+        `;
+
+        targetsGrid.appendChild(card);
+    });
+
+}
+
+/* =========================================================
+   ЦЕЛИ
+   ========================================================= */
+
+function getTargets() {
+
+    const targets = {};
+
+    document
+        .querySelectorAll(
+            ".target-input"
+        )
+        .forEach(
+            input => {
+
+                const stat =
+                    input.dataset.targetStat;
+
+                let value =
+                    Number(
+                        input.value
+                    );
+
+                /*
+                    Если пользователь оставил
+                    только "-" или поле пустое,
+                    используем значение по умолчанию.
+                */
+
+                if (
+                    !Number.isFinite(value)
+                ) {
+
+                    value =
+                        DEFAULT_TARGETS[stat];
+
+                }
+
+                /*
+                    Для перезарядки результат
+                    не может быть лучше −50%.
+                */
+
+                if (
+                    COOLDOWN_STATS.includes(
+                        stat
+                    )
+                ) {
+
+                    value =
+                        Math.max(
+                            -50,
+                            Math.min(
+                                0,
+                                value
+                            )
+                        );
+
+                }
+
+                targets[stat] =
+                    value;
+
+            }
+        );
+
+    return targets;
+
+}
+
+
+/* =========================================================
+   ПРОКИ
+   ========================================================= */
+
+function getProcs() {
+
+    const slots = [];
+
+    for (
+        let slot = 0;
+        slot < 5;
+        slot++
+    ) {
+
+        const cells =
+            procCells.filter(
+                cell =>
+                    Number(
+                        cell.dataset.slot
+                    ) === slot
+            );
+
+        const values =
+            cells.map(
+                cell => {
+
+                    if (
+                        cell.value.trim() === ""
+                    ) {
+
+                        return 0;
+
+                    }
+
+                    let value =
+                        Number(
+                            cell.value
+                        );
+
+                    if (
+                        !Number.isFinite(value)
+                    ) {
+
+                        return 0;
+
+                    }
+
+                    value =
+                        Math.floor(
+                            value
+                        );
+
+                    return Math.max(
+                        0,
+                        Math.min(
+                            getSlotTotalProcs(slot),
+                            value
+                        )
+                    );
+
+                }
+            );
+
+        slots.push(
+            values
+        );
+
+    }
+
+    return slots;
+
+}
+
+
+/* =========================================================
+   ПРОКИ ЗВЕЗДЫ
+   ========================================================= */
+
+function getInvitedStarProcs() {
+
+    return invitedStarCells.map(
+        cell => {
+
+            if (
+                cell.value.trim() === ""
+            ) {
+
+                return 0;
+
+            }
+
+            let value =
+                Number(
+                    cell.value
+                );
+
+            if (
+                !Number.isFinite(value)
+            ) {
+
+                return 0;
+
+            }
+
+            value =
+                Math.floor(
+                    value
+                );
+
+            return Math.max(
+                0,
+                Math.min(
+                    getInvitedStarTotalProcs(),
+                    value
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ВЫБРАННЫЕ СТАТЫ
+   ========================================================= */
+
+function getEnabledStats() {return statChecks
+        .filter(
+            check =>
+                check.checked
+        )
+        .map(
+            check =>
+                check.value
+        );
+
+}
+
+
+/* =========================================================
+   ПРОВЕРКА
+   ========================================================= */
+
+function validate() {
+
+    const stats = getEnabledStats();
+    const procs = getProcs();
+    const invitedStarProcs = getInvitedStarProcs();
+
+    if (stats.length < 3) {
+        return { valid: false, error: "Нужно выбрать минимум 3 характеристики." };
+    }
+
+    for (let i = 0; i < procs.length; i++) {
+        const sum = procs[i][0] + procs[i][1] + procs[i][2];
+        const required = getSlotTotalProcs(i);
+        if (sum !== required) {
+            return {
+                valid: false,
+                error: `В слоте ${i + 1} на уровне ${getSlotLevel(i)} сумма проков должна быть ${required}. Сейчас: ${sum}.`
+            };
+        }
+    }
+
+    const invitedStarSum = invitedStarProcs.reduce((total, value) => total + value, 0);
+    const invitedRequired = getInvitedStarTotalProcs();
+
+    if (invitedStarSum !== invitedRequired) {
+        return {
+            valid: false,
+            error: `В «Приглашённой звезде» на уровне ${getInvitedStarLevel()} сумма проков должна быть ${invitedRequired}. Сейчас: ${invitedStarSum}.`
+        };
+    }
+
+    const zeroCount = invitedStarProcs.filter(value => value === 0).length;
+    const maxZeros = getInvitedStarMaxZeros();
+
+    if (zeroCount > maxZeros) {
+        return {
+            valid: false,
+            error: `В «Приглашённой звезде» на этом уровне может быть не больше ${maxZeros} нулевых проков. Сейчас: ${zeroCount}.`
+        };
+    }
+
+    return { valid: true, error: "" };
+
+}
+
+/* =========================================================
+   СУММЫ
+   ========================================================= */
+
+function updateProcSums() {
+
+    const slots =
+        [
+            ...document.querySelectorAll(
+                ".slot"
+            )
+        ];
+
+    slots.forEach(
+        slot => {
+
+            const inputs =
+                [
+                    ...slot.querySelectorAll(
+                        ".proc-cell"
+                    )
+                ];
+
+            const sum =
+                inputs.reduce(
+                    (
+                        total,
+                        input
+                    ) => {
+
+                        const value =
+                            Number(
+                                input.value
+                            );
+
+                        if (
+                            !Number.isFinite(value)
+                        ) {
+
+                            return total;
+
+                        }
+
+                        return total + value;
+
+                    },
+                    0
+                );
+
+            const span =
+                slot.querySelector(
+                    ".proc-sum span"
+                );
+
+            const box =
+                slot.querySelector(
+                    ".proc-sum"
+                );
+
+            span.textContent =
+                sum;
+
+            box.classList.remove(
+                "ok",
+                "bad"
+            );
+
+            const slotIndex = Number(slot.querySelector(".proc-level")?.dataset.slotLevel || 0);
+            const required = getSlotTotalProcs(slotIndex);
+            box.classList.add(
+                sum === required
+                    ? "ok"
+                    : "bad"
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   СУММА ЗВЕЗДЫ
+   ========================================================= */
+
+function updateInvitedStarSum() {
+
+    const values =
+        getInvitedStarProcs();const sum =
+        values.reduce(
+            (
+                total,
+                value
+            ) =>
+                total + value,
+            0
+        );
+
+    const zeroCount =
+        values.filter(
+            value =>
+                value === 0
+        ).length;
+
+    const box =
+        document.getElementById(
+            "invitedStarSum"
+        );
+
+    const span =
+        box.querySelector(
+            "span"
+        );
+
+    const zeroBox =
+        document.getElementById(
+            "invitedStarZero"
+        );
+
+    const zeroSpan =
+        zeroBox.querySelector(
+            "span"
+        );
+
+    span.textContent =
+        sum;
+
+    zeroSpan.textContent =
+        zeroCount;
+
+    box.classList.remove(
+        "ok",
+        "bad"
+    );
+
+    zeroBox.classList.remove(
+        "good",
+        "bad"
+    );
+
+    box.classList.add(
+        sum === getInvitedStarTotalProcs()
+            ? "ok"
+            : "bad"
+    );
+
+    zeroBox.classList.add(
+        zeroCount <= getInvitedStarMaxZeros()
+            ? "good"
+            : "bad"
+    );
+
+}
+
+
+/* =========================================================
+   ЗНАЧЕНИЕ ОБЫЧНОГО ПРОКА
+   ========================================================= */
+
+function procValue(
+    stat,
+    proc
+) {
+
+    if (
+        COOLDOWN_STATS.includes(
+            stat
+        )
+    ) {
+
+        return -3 * proc;
+
+    }
+
+    if (
+        stat === "attack"
+    ) {
+
+        return 6 +
+            proc * 3;
+
+    }
+
+    return 3 *
+        (
+            proc + 1
+        );
+
+}
+
+
+/* =========================================================
+   ЗНАЧЕНИЕ ПРОКА ЗВЕЗДЫ
+   ========================================================= */
+
+function invitedStarProcValue(
+    stat,
+    proc
+) {
+
+    if (
+        COOLDOWN_STATS.includes(
+            stat
+        )
+    ) {
+
+        return -2 * proc;
+
+    }
+
+    if (
+        stat === "attack"
+    ) {
+
+        return 4 +
+            proc * 2;
+
+    }
+
+    return 2 +
+        proc * 2;
+
+}
+
+
+/* =========================================================
+   ИТОГОВОЕ ЗНАЧЕНИЕ
+   ========================================================= */
+
+function finalValue(
+    stat,
+    procTotal
+) {
+
+    let value =
+        (
+            BASE_VALUES[stat] || 0
+        ) +
+        procTotal;
+
+    if (
+        COOLDOWN_STATS.includes(
+            stat
+        )
+    ) {
+
+        value =
+            Math.max(
+                -50,
+                value
+            );
+
+    }
+
+    return value;
+
+}
+
+
+/* =========================================================
+   АНАЛИЗ
+   ========================================================= */
+
+function analyzeStat(
+    stat,
+    value,
+    targets
+) {
+
+    const target =
+        targets[stat];
+
+    if (
+        !COOLDOWN_STATS.includes(
+            stat
+        )
+    ) {
+
+        return {
+
+            deficit:
+                Math.max(
+                    0,
+                    target - value
+                ),
+
+            overflow:
+                Math.max(
+                    0,
+                    value - target
+                ),
+
+            distance:
+                Math.abs(
+                    value - target
+                )
+
+        };
+
+    }
+
+    return {
+
+        deficit:
+            Math.max(
+                0,
+                value - target
+            ),
+
+        overflow:
+            Math.max(
+                0,
+                target - value
+            ),
+
+        distance:
+            Math.abs(
+                value - target
+            )
+
+    };
+
+}
+
+
+/* =========================================================
+   ГЕНЕРАЦИЯ НАЗНАЧЕНИЙ
+   ========================================================= */
+
+function generateAssignments(
+    stats,
+    procValues
+) {
+
+    const result = [];
+
+    for (
+        let a = 0;
+        a < stats.length;
+        a++
+    ) {
+
+        for (
+            let b = 0;
+            b < stats.length;
+            b++
+        ) {
+
+            if (
+                b === a
+            ) {
+
+                continue;
+
+            }for (
+                let c = 0;
+                c < stats.length;
+                c++
+            ) {
+
+                if (
+                    c === a ||
+                    c === b
+                ) {
+
+                    continue;
+
+                }
+
+                result.push([
+
+                    {
+                        stat: stats[a],
+                        proc: procValues[0],
+                        value:
+                            procValue(
+                                stats[a],
+                                procValues[0]
+                            )
+                    },
+
+                    {
+                        stat: stats[b],
+                        proc: procValues[1],
+                        value:
+                            procValue(
+                                stats[b],
+                                procValues[1]
+                            )
+                    },
+
+                    {
+                        stat: stats[c],
+                        proc: procValues[2],
+                        value:
+                            procValue(
+                                stats[c],
+                                procValues[2]
+                            )
+                    }
+
+                ]);
+
+            }
+
+        }
+
+    }
+
+    return result;
+
+}
+
+
+/* =========================================================
+   ГЕНЕРАЦИЯ ЗВЕЗДЫ
+   ========================================================= */
+
+function generateInvitedStarAssignments(
+    stats,
+    procValues
+) {
+
+    const result = [];
+
+    const sum =
+        procValues[0] +
+        procValues[1] +
+        procValues[2];
+
+    if (
+        sum < 0 ||
+        sum > INVITED_STAR_MAX_PROC
+    ) {
+
+        return result;
+
+    }
+
+    if (
+        procValues.some(
+            value =>
+                value < 0 ||
+                value > INVITED_STAR_MAX_PROC
+        )
+    ) {
+
+        return result;
+
+    }
+
+    const zeroCount =
+        procValues.filter(
+            value =>
+                value === 0
+        ).length;
+
+    const allowedZeros = Math.max(INVITED_STAR_MAX_ZEROS, 3 - sum);
+
+    if (
+        zeroCount >
+        allowedZeros
+    ) {
+
+        return result;
+
+    }
+
+    for (
+        let a = 0;
+        a < stats.length;
+        a++
+    ) {
+
+        for (
+            let b = 0;
+            b < stats.length;
+            b++
+        ) {
+
+            if (
+                b === a
+            ) {
+
+                continue;
+
+            }
+
+            for (
+                let c = 0;
+                c < stats.length;
+                c++
+            ) {
+
+                if (
+                    c === a ||
+                    c === b
+                ) {
+
+                    continue;
+
+                }
+
+                result.push([
+
+                    {
+                        stat: stats[a],
+                        proc: procValues[0],
+                        value:
+                            invitedStarProcValue(
+                                stats[a],
+                                procValues[0]
+                            )
+                    },
+
+                    {
+                        stat: stats[b],
+                        proc: procValues[1],
+                        value:
+                            invitedStarProcValue(
+                                stats[b],
+                                procValues[1]
+                            )
+                    },
+
+                    {
+                        stat: stats[c],
+                        proc: procValues[2],
+                        value:
+                            invitedStarProcValue(
+                                stats[c],
+                                procValues[2]
+                            )
+                    }
+
+                ]);
+
+            }
+
+        }
+
+    }
+
+    return result;
+
+}
+
+
+/* =========================================================
+   ДОБАВЛЕНИЕ
+   ========================================================= */
+
+function addAssignment(
+    totals,
+    assignment
+) {
+
+    const next = {
+        ...totals
+    };
+
+    for (
+        const item of assignment
+    ) {next[item.stat] =
+            (
+                next[item.stat] || 0
+            ) +
+            item.value;
+
+    }
+
+    return next;
+
+}
+
+
+/* =========================================================
+   ОЦЕНКА СОСТОЯНИЯ
+   ========================================================= */
+
+function solutionMetrics(
+    state,
+    stats,
+    targets
+) {
+
+    let deficit = 0;
+    let overflow = 0;
+    let distance = 0;
+
+    for (
+        const stat of stats
+    ) {
+
+        const value =
+            finalValue(
+                stat,
+                state.totals[stat] || 0
+            );
+
+        const analysis =
+            analyzeStat(
+                stat,
+                value,
+                targets
+            );
+
+        deficit +=
+            analysis.deficit;
+
+        overflow +=
+            analysis.overflow;
+
+        distance +=
+            analysis.distance;
+
+    }
+
+    return {
+
+        deficit,
+        overflow,
+        distance
+
+    };
+
+}
+
+
+/* =========================================================
+   СРАВНЕНИЕ
+   ========================================================= */
+
+function compareSolutions(
+    a,
+    b,
+    stats,
+    targets
+) {
+
+    if (
+        !b
+    ) {
+
+        return true;
+
+    }
+
+    const am =
+        solutionMetrics(
+            a,
+            stats,
+            targets
+        );
+
+    const bm =
+        solutionMetrics(
+            b,
+            stats,
+            targets
+        );
+
+    if (
+        am.deficit !==
+        bm.deficit
+    ) {
+
+        return am.deficit <
+            bm.deficit;
+
+    }
+
+    if (
+        am.overflow !==
+        bm.overflow
+    ) {
+
+        return am.overflow <
+            bm.overflow;
+
+    }
+
+    if (
+        am.distance !==
+        bm.distance
+    ) {
+
+        return am.distance <
+            bm.distance;
+
+    }
+
+    for (
+        const stat of TIE_BREAK_PRIORITY
+    ) {
+
+        if (
+            !stats.includes(stat)
+        ) {
+
+            continue;
+
+        }
+
+        const av =
+            a.totals[stat] || 0;
+
+        const bv =
+            b.totals[stat] || 0;
+
+        if (
+            av !== bv
+        ) {
+
+            if (
+                COOLDOWN_STATS.includes(
+                    stat
+                )
+            ) {
+
+                return av < bv;
+
+            }
+
+            return av > bv;
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/* =========================================================
+   KEY
+   ========================================================= */
+
+function makeKey(
+    totals,
+    stats
+) {
+
+    return stats
+        .map(
+            stat =>
+                stat +
+                ":" +
+                (
+                    totals[stat] || 0
+                )
+        )
+        .join("|");
+
+}
+
+
+/* =========================================================
+   БЫСТРАЯ ОЦЕНКА
+   ========================================================= */
+
+function quickScore(
+    state,
+    stats,
+    targets
+) {
+
+    let score = 0;
+
+    for (
+        const stat of stats
+    ) {
+
+        const value =
+            finalValue(
+                stat,
+                state.totals[stat] || 0
+            );
+
+        const target =
+            targets[stat];
+
+        if (
+            COOLDOWN_STATS.includes(
+                stat
+            )
+        ) {
+
+            score +=
+                Math.abs(
+                    value - target
+                );
+
+        } else {
+
+            score +=
+                Math.max(
+                    0,
+                    target - value
+                ) *
+                2;
+
+            score +=
+                Math.max(
+                    0,
+                    value - target
+                );
+
+        }
+
+    }
+
+    return score;
+
+}
+
+
+/* =========================================================
+   ОГРАНИЧЕННОЕ СЖАТИЕ
+   ========================================================= */
+
+function compressAndPrune(
+    states,
+    stats,
+    targets,
+    limit
+) {
+
+    const map =
+        new Map();
+
+    for (
+        const state of states
+    ) {const key =
+            makeKey(
+                state.totals,
+                stats
+            );
+
+        const old =
+            map.get(key);
+
+        if (
+            !old ||
+            compareSolutions(
+                state,
+                old,
+                stats,
+                targets
+            )
+        ) {
+
+            map.set(
+                key,
+                state
+            );
+
+        }
+
+    }
+
+    let uniqueStates =
+        [
+            ...map.values()
+        ];
+
+    if (
+        uniqueStates.length <= limit
+    ) {
+
+        return uniqueStates;
+
+    }
+
+    uniqueStates.sort(
+        (
+            a,
+            b
+        ) =>
+            quickScore(
+                a,
+                stats,
+                targets
+            ) -
+            quickScore(
+                b,
+                stats,
+                targets
+            )
+    );
+
+    uniqueStates =
+        uniqueStates.slice(
+            0,
+            limit
+        );
+
+    uniqueStates.sort(
+        (
+            a,
+            b
+        ) => {
+
+            if (
+                compareSolutions(
+                    a,
+                    b,
+                    stats,
+                    targets
+                )
+            ) {
+
+                return -1;
+
+            }
+
+            if (
+                compareSolutions(
+                    b,
+                    a,
+                    stats,
+                    targets
+                )
+            ) {
+
+                return 1;
+
+            }
+
+            return 0;
+
+        }
+    );
+
+    return uniqueStates;
+
+}
+
+
+/* =========================================================
+   WORKER
+   ========================================================= */
+
+function createWorker() {
+
+    const workerCode = `
+
+"use strict";
+
+const BASE_VALUES =
+${JSON.stringify(BASE_VALUES)};
+
+const COOLDOWN_STATS =
+${JSON.stringify(COOLDOWN_STATS)};
+
+const TIE_BREAK_PRIORITY =
+${JSON.stringify(TIE_BREAK_PRIORITY)};
+
+const INVITED_STAR_MAX_PROC =
+${INVITED_STAR_MAX_PROC};
+
+const INVITED_STAR_MAX_ZEROS =
+${INVITED_STAR_MAX_ZEROS};
+
+const BEAM_LIMITS =
+${JSON.stringify(BEAM_LIMITS)};
+
+function procValue(
+    stat,
+    proc
+) {
+
+    if (
+        COOLDOWN_STATS.includes(stat)
+    ) {
+
+        return -3 * proc;
+
+    }
+
+    if (
+        stat === "attack"
+    ) {
+
+        return 6 +
+            proc * 3;
+
+    }
+
+    return 3 *
+        (
+            proc + 1
+        );
+
+}
+
+function invitedStarProcValue(
+    stat,
+    proc
+) {
+
+    if (
+        COOLDOWN_STATS.includes(stat)
+    ) {
+
+        return -2 * proc;
+
+    }
+
+    if (
+        stat === "attack"
+    ) {
+
+        return 4 +
+            proc * 2;
+
+    }
+
+    return 2 +
+        proc * 2;
+
+}
+
+function finalValue(
+    stat,
+    procTotal
+) {
+
+    let value =
+        (
+            BASE_VALUES[stat] || 0
+        ) +
+        procTotal;
+
+    if (
+        COOLDOWN_STATS.includes(stat)
+    ) {
+
+        value =
+            Math.max(
+                -50,
+                value
+            );
+
+    }
+
+    return value;
+
+}
+
+function analyzeStat(
+    stat,
+    value,
+    targets
+) {
+
+    const target =
+        targets[stat];
+
+    if (
+        !COOLDOWN_STATS.includes(stat)
+    ) {
+
+        return {
+
+            deficit:
+                Math.max(
+                    0,
+                    target - value
+                ),
+
+            overflow:
+                Math.max(
+                    0,
+                    value - target
+                ),
+
+            distance:
+                Math.abs(
+                    value - target
+                )
+
+        };
+
+    }
+
+    return {
+
+        deficit:
+            Math.max(
+                0,
+                value - target
+            ),
+
+        overflow:
+            Math.max(
+                0,
+                target - value
+            ),
+
+        distance:
+            Math.abs(
+                value - target
+            )
+
+    };
+
+}
+
+function solutionMetrics(
+    state,
+    stats,
+    targets
+) {let deficit = 0;
+    let overflow = 0;
+    let distance = 0;
+
+    for (
+        const stat of stats
+    ) {
+
+        const value =
+            finalValue(
+                stat,
+                state.totals[stat] || 0
+            );
+
+        const a =
+            analyzeStat(
+                stat,
+                value,
+                targets
+            );
+
+        deficit +=
+            a.deficit;
+
+        overflow +=
+            a.overflow;
+
+        distance +=
+            a.distance;
+
+    }
+
+    return {
+
+        deficit,
+        overflow,
+        distance
+
+    };
+
+}
+
+function better(
+    a,
+    b,
+    stats,
+    targets
+) {
+
+    if (
+        !b
+    ) {
+
+        return true;
+
+    }
+
+    const am =
+        solutionMetrics(
+            a,
+            stats,
+            targets
+        );
+
+    const bm =
+        solutionMetrics(
+            b,
+            stats,
+            targets
+        );
+
+    if (
+        am.deficit !==
+        bm.deficit
+    ) {
+
+        return am.deficit <
+            bm.deficit;
+
+    }
+
+    if (
+        am.overflow !==
+        bm.overflow
+    ) {
+
+        return am.overflow <
+            bm.overflow;
+
+    }
+
+    if (
+        am.distance !==
+        bm.distance
+    ) {
+
+        return am.distance <
+            bm.distance;
+
+    }
+
+    for (
+        const stat of TIE_BREAK_PRIORITY
+    ) {
+
+        if (
+            !stats.includes(stat)
+        ) {
+
+            continue;
+
+        }
+
+        const av =
+            a.totals[stat] || 0;
+
+        const bv =
+            b.totals[stat] || 0;
+
+        if (
+            av !== bv
+        ) {
+
+            if (
+                COOLDOWN_STATS.includes(stat)
+            ) {
+
+                return av < bv;
+
+            }
+
+            return av > bv;
+
+        }
+
+    }
+
+    return false;
+
+}
+
+function quickScore(
+    state,
+    stats,
+    targets
+) {
+
+    let score = 0;
+
+    for (
+        const stat of stats
+    ) {
+
+        const value =
+            finalValue(
+                stat,
+                state.totals[stat] || 0
+            );
+
+        const target =
+            targets[stat];
+
+        if (
+            COOLDOWN_STATS.includes(stat)
+        ) {
+
+            score +=
+                Math.abs(
+                    value - target
+                );
+
+        } else {
+
+            score +=
+                Math.max(
+                    0,
+                    target - value
+                ) *
+                2;
+
+            score +=
+                Math.max(
+                    0,
+                    value - target
+                );
+
+        }
+
+    }
+
+    return score;
+
+}
+
+function generateAssignments(
+    stats,
+    procValues
+) {
+
+    const result = [];
+
+    for (
+        let a = 0;
+        a < stats.length;
+        a++
+    ) {
+
+        for (
+            let b = 0;
+            b < stats.length;
+            b++
+        ) {
+
+            if (
+                b === a
+            ) {
+
+                continue;
+
+            }
+
+            for (
+                let c = 0;
+                c < stats.length;
+                c++
+            ) {
+
+                if (
+                    c === a ||
+                    c === b
+                ) {
+
+                    continue;
+
+                }
+
+                result.push([
+
+                    {
+                        stat: stats[a],
+                        proc: procValues[0],
+                        value:
+                            procValue(
+                                stats[a],
+                                procValues[0]
+                            )
+                    },
+
+                    {
+                        stat: stats[b],
+                        proc: procValues[1],
+                        value:
+                            procValue(
+                                stats[b],
+                                procValues[1]
+                            )
+                    },{
+                        stat: stats[c],
+                        proc: procValues[2],
+                        value:
+                            procValue(
+                                stats[c],
+                                procValues[2]
+                            )
+                    }
+
+                ]);
+
+            }
+
+        }
+
+    }
+
+    return result;
+
+}
+
+function generateInvitedStarAssignments(
+    stats,
+    procValues
+) {
+
+    const result = [];
+
+    const sum =
+        procValues[0] +
+        procValues[1] +
+        procValues[2];
+
+    if (
+        sum < 0 ||
+        sum > INVITED_STAR_MAX_PROC
+    ) {
+
+        return result;
+
+    }
+
+    if (
+        procValues.some(
+            value =>
+                value < 0 ||
+                value > INVITED_STAR_MAX_PROC
+        )
+    ) {
+
+        return result;
+
+    }
+
+    const zeroCount =
+        procValues.filter(
+            value =>
+                value === 0
+        ).length;
+
+    const allowedZeros =
+        Math.max(
+            INVITED_STAR_MAX_ZEROS,
+            3 - sum
+        );
+
+    if (
+        zeroCount >
+        allowedZeros
+    ) {
+
+        return result;
+
+    }
+
+    for (
+        let a = 0;
+        a < stats.length;
+        a++
+    ) {
+
+        for (
+            let b = 0;
+            b < stats.length;
+            b++
+        ) {
+
+            if (
+                b === a
+            ) {
+
+                continue;
+
+            }
+
+            for (
+                let c = 0;
+                c < stats.length;
+                c++
+            ) {
+
+                if (
+                    c === a ||
+                    c === b
+                ) {
+
+                    continue;
+
+                }
+
+                result.push([
+
+                    {
+                        stat: stats[a],
+                        proc: procValues[0],
+                        value:
+                            invitedStarProcValue(
+                                stats[a],
+                                procValues[0]
+                            )
+                    },
+
+                    {
+                        stat: stats[b],
+                        proc: procValues[1],
+                        value:
+                            invitedStarProcValue(
+                                stats[b],
+                                procValues[1]
+                            )
+                    },
+
+                    {
+                        stat: stats[c],
+                        proc: procValues[2],
+                        value:
+                            invitedStarProcValue(
+                                stats[c],
+                                procValues[2]
+                            )
+                    }
+
+                ]);
+
+            }
+
+        }
+
+    }
+
+    return result;
+
+}
+
+function addAssignment(
+    totals,
+    assignment
+) {
+
+    const next = {
+        ...totals
+    };
+
+    for (
+        const item of assignment
+    ) {
+
+        next[item.stat] =
+            (
+                next[item.stat] || 0
+            ) +
+            item.value;
+
+    }
+
+    return next;
+
+}
+
+function makeKey(
+    totals,
+    stats
+) {
+
+    return stats
+        .map(
+            stat =>
+                stat +
+                ":" +
+                (
+                    totals[stat] || 0
+                )
+        )
+        .join("|");
+
+}
+
+function compressAndPrune(
+    states,
+    stats,
+    targets,
+    limit
+) {
+
+    const map =
+        new Map();
+
+    for (
+        const state of states
+    ) {
+
+        const key =
+            makeKey(
+                state.totals,
+                stats
+            );
+
+        const old =
+            map.get(key);
+
+        if (
+            !old ||
+            better(
+                state,
+                old,
+                stats,
+                targets
+            )
+        ) {
+
+            map.set(
+                key,
+                state
+            );
+
+        }
+
+    }
+
+    let values =
+        [
+            ...map.values()
+        ];
+
+    if (
+        values.length <= limit
+    ) {
+
+        return values;
+
+    }values.sort(
+        (
+            a,
+            b
+        ) =>
+            quickScore(
+                a,
+                stats,
+                targets
+            ) -
+            quickScore(
+                b,
+                stats,
+                targets
+            )
+    );
+
+    return values.slice(
+        0,
+        limit
+    );
+
+}
+
+/*
+ * Точный динамический поиск с дедупликацией состояний.
+ * Ограничение — защитный предохранитель: если уникальных состояний слишком
+ * много, функция возвращает null и вызывающий код запускает Beam Search.
+ * В таком случае результат НЕ помечается как доказанно оптимальный.
+ */
+const EXACT_STATE_CAP = 150000;
+
+function exactSearch(data) {
+    const stats = data.stats;
+    const procs = data.procs;
+    const invitedStarProcs = data.invitedStarProcs;
+    const targets = data.targets;
+    const assignments = procs.map(slot => generateAssignments(stats, slot));
+    let states = [{ totals: {}, slots: [], invitedStar: null }];
+
+    for (let slotIndex = 0; slotIndex < 5; slotIndex++) {
+        const nextMap = new Map();
+        const slotAssignments = assignments[slotIndex];
+        for (const state of states) {
+            for (const assignment of slotAssignments) {
+                const totals = addAssignment(state.totals, assignment);
+                const key = makeKey(totals, stats);
+                if (!nextMap.has(key)) {
+                    nextMap.set(key, {
+                        totals,
+                        slots: state.slots.concat([assignment]),
+                        invitedStar: null
+                    });
+                    if (nextMap.size > EXACT_STATE_CAP) return null;
+                }
+            }
+        }
+        states = [...nextMap.values()];
+        self.postMessage({type: "progress", slot: slotIndex + 1, states: states.length, exact: true});
+    }
+
+    const invitedAssignments = generateInvitedStarAssignments(stats, invitedStarProcs);
+    if (!invitedAssignments.length) throw new Error("Некорректные проки приглашённой звезды.");
+
+    const finalMap = new Map();
+    for (const state of states) {
+        for (const assignment of invitedAssignments) {
+            const totals = addAssignment(state.totals, assignment);
+            const key = makeKey(totals, stats);
+            if (!finalMap.has(key)) {
+                finalMap.set(key, {totals, slots: state.slots, invitedStar: assignment});
+                if (finalMap.size > EXACT_STATE_CAP) return null;
+            }
+        }
+    }
+
+    const finalStates = [...finalMap.values()];
+    self.postMessage({type: "progress", slot: "★", states: finalStates.length, exact: true});
+    let best = null;
+    for (const state of finalStates) {
+        if (better(state, best, stats, targets)) best = state;
+    }
+    return best;
+}
+
+self.onmessage =
+function(event) {
+
+    try {
+
+        const data =
+            event.data;
+
+        const stats =
+            data.stats;
+
+        const procs =
+            data.procs;
+
+        const invitedStarProcs =
+            data.invitedStarProcs;
+
+        const targets =
+            data.targets;
+
+        const beamLimit =
+            BEAM_LIMITS[
+                Math.min(
+                    8,
+                    Math.max(
+                        3,
+                        stats.length
+                    )
+                )
+            ] ||
+            3000;
+
+        self.postMessage({
+
+            type: "mode",
+
+            statsCount:
+                stats.length,
+
+            beamLimit
+
+        });
+
+        if (stats.length <= 4) {
+            self.postMessage({type: "mode", statsCount: stats.length, beamLimit, exactAttempt: true});
+            const exactResult = exactSearch(data);
+            if (exactResult) {
+                self.postMessage({type: "done", result: exactResult, optimality: "proven"});
+                return;
+            }
+            self.postMessage({type: "mode", statsCount: stats.length, beamLimit, exactFallback: true});
+        }
+
+        const assignments =
+            procs.map(
+                slot =>
+                    generateAssignments(
+                        stats,
+                        slot
+                    )
+            );
+
+        let states = [
+
+            {
+
+                totals: {},
+
+                slots: [],
+
+                invitedStar: null
+
+            }
+
+        ];
+
+        for (
+            let slotIndex = 0;
+            slotIndex < 5;
+            slotIndex++
+        ) {
+
+            const slotAssignments =
+                assignments[
+                    slotIndex
+                ];
+
+            const next = [];
+
+            const CHUNK_SIZE =
+                250000;
+
+            for (
+                let stateIndex = 0;
+                stateIndex < states.length;
+                stateIndex++
+            ) {
+
+                const state =
+                    states[stateIndex];
+
+                for (
+                    const assignment
+                    of slotAssignments
+                ) {
+
+                    const totals =
+                        addAssignment(
+                            state.totals,
+                            assignment
+                        );
+
+                    next.push({
+
+                        totals,
+
+                        slots:
+                            state.slots.concat([
+                                assignment
+                            ]),
+
+                        invitedStar:
+                            null
+
+                    });
+
+                    if (
+                        next.length >=
+                        CHUNK_SIZE
+                    ) {
+
+                        const reduced =
+                            compressAndPrune(
+                                next,
+                                stats,
+                                targets,
+                                beamLimit
+                            );
+
+                        next.length = 0;
+
+                        for (
+                            const item
+                            of reduced
+                        ) {
+
+                            next.push(
+                                item
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            states =
+                compressAndPrune(
+                    next,
+                    stats,
+                    targets,
+                    beamLimit
+                );
+
+            self.postMessage({
+
+                type: "progress",
+
+                slot:
+                    slotIndex + 1,
+
+                states:
+                    states.length,
+
+                beamLimit
+
+            });
+
+        }
+
+        const invitedAssignments =
+            generateInvitedStarAssignments(
+                stats,
+                invitedStarProcs
+            );
+
+        if (
+            invitedAssignments.length === 0
+        ) {
+
+            self.postMessage({
+
+                type: "error",error:
+                    "Некорректные проки приглашённой звезды."
+
+            });
+
+            return;
+
+        }
+
+        let finalStates = [];
+        let finalChunk = [];
+        const FINAL_CHUNK = 250000;
+
+        for (const state of states) {
+            for (const assignment of invitedAssignments) {
+                const totals = addAssignment(state.totals, assignment);
+                finalChunk.push({totals, slots: state.slots, invitedStar: assignment});
+                if (finalChunk.length >= FINAL_CHUNK) {
+                    const reduced = compressAndPrune(
+                        finalStates.concat(finalChunk), stats, targets, Math.max(beamLimit, 1000)
+                    );
+                    finalStates = reduced;
+                    finalChunk = [];
+                }
+            }
+        }
+        if (finalChunk.length) {
+            finalStates = compressAndPrune(
+                finalStates.concat(finalChunk), stats, targets, Math.max(beamLimit, 1000)
+            );
+        }
+        states = finalStates;
+
+        self.postMessage({
+
+            type: "progress",
+
+            slot: "★",
+
+            states:
+                states.length,
+
+            beamLimit
+
+        });
+
+        let best =
+            null;
+
+        for (
+            const state of states
+        ) {
+
+            if (
+                better(
+                    state,
+                    best,
+                    stats,
+                    targets
+                )
+            ) {
+
+                best =
+                    state;
+
+            }
+
+        }
+
+        self.postMessage({
+
+            type: "done",
+
+            result:
+                best
+
+        });
+
+    }
+    catch (
+        error
+    ) {
+
+        self.postMessage({
+
+            type: "error",
+
+            error:
+                error &&
+                error.message
+                    ?
+                    error.message
+                    :
+                    String(error)
+
+        });
+
+    }
+
+};
+
+`;
+
+    const blob =
+        new Blob(
+            [workerCode],
+            {
+                type:
+                    "application/javascript"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+    const worker =
+        new Worker(
+            url
+        );
+
+    worker.__blobUrl =
+        url;
+
+    return worker;
+
+}
+
+
+/* =========================================================
+   ФОРМАТ
+   ========================================================= */
+
+function formatPercent(
+    value
+) {
+
+    if (
+        value > 0
+    ) {
+
+        return `+${value}%`;
+
+    }
+
+    return `${value}%`;
+
+}
+
+
+/* =========================================================
+   СТАТУС
+   ========================================================= */
+
+function getStatus(
+    stat,
+    analysis
+) {
+
+    if (
+        analysis.deficit > 0
+    ) {
+
+        return {
+
+            text:
+                `Недостаток: ${formatPercent(analysis.deficit)}`,
+
+            className:
+                "bad"
+
+        };
+
+    }
+
+    if (
+        analysis.overflow > 0
+    ) {
+
+        return {
+
+            text:
+                `Перелив: +${analysis.overflow}%`,
+
+            className:
+                "warning"
+
+        };
+
+    }
+
+    return {
+
+        text:
+            "Точное попадание в цель",
+
+        className:
+            "good"
+
+    };
+
+}
+
+
+/* =========================================================
+   РЕЗУЛЬТАТ
+   ========================================================= */
+
+function showResult(solution, stats, targets) {
+
+    result.style.display = "block";
+    let html = `<h3>Распределение характеристик</h3>`;
+
+    solution.slots.forEach((slot, slotIndex) => {
+        const level = getSlotLevel(slotIndex);
+        html += `<div class="result-slot"><h3>Слот ${slotIndex + 1} — уровень ${level} (${level - 1} проков)</h3>`;
+        slot.forEach((item, cellIndex) => {
+            html += `<div class="result-stat"><span>Ячейка ${cellIndex + 1}: <strong>${STAT_NAMES[item.stat]}</strong></span><span>${item.proc} проков (${formatPercent(item.value)})</span></div>`;
+        });
+        html += `</div>`;
+    });
+
+    if (solution.invitedStar) {
+        const starLevel = getInvitedStarLevel();
+        const starTotal = getInvitedStarTotalProcs();
+        html += `<div class="result-slot invited-star-result"><h3>★ Приглашённая звезда — уровень ${starLevel} (${starTotal} проков)</h3><div class="small">Максимум нулевых проков на этом уровне: ${getInvitedStarMaxZeros()}.</div>`;
+        solution.invitedStar.forEach((item, cellIndex) => {
+            html += `<div class="result-stat"><span>Ячейка ${cellIndex + 1}: <strong>${STAT_NAMES[item.stat]}</strong></span><span>${item.proc} проков (${formatPercent(item.value)})</span></div>`;
+        });
+        html += `</div>`;
+    }
+
+    html += `<h3>Итоговые характеристики</h3><div class="summary-grid">`;
+    let totalDeficit = 0;
+    let totalOverflow = 0;
+
+    stats.forEach(stat => {
+        const procTotal = solution.totals[stat] || 0;
+        const value = finalValue(stat, procTotal);
+        const analysis = analyzeStat(stat, value, targets);
+        const status = getStatus(stat, analysis);
+        totalDeficit += analysis.deficit;
+        totalOverflow += analysis.overflow;
+        html += `<div class="summary-card"><strong>${STAT_NAMES[stat]}</strong><div class="big-value ${status.className}">${formatPercent(value)}</div><div class="small">Цель: ${formatPercent(targets[stat])}</div><div class="small">${status.text}</div></div>`;
+    });
+
+    const normalTotal = getSlotTotalProcs(0) + getSlotTotalProcs(1) + getSlotTotalProcs(2) + getSlotTotalProcs(3) + getSlotTotalProcs(4);
+    const starTotal = getInvitedStarTotalProcs();
+    const grandTotal = normalTotal + starTotal;
+
+    html += `<div class="summary-card"><strong>Общий дефицит</strong><div class="big-value ${totalDeficit === 0 ? "good" : "bad"}">${formatPercent(totalDeficit)}</div></div>`;
+    html += `<div class="summary-card"><strong>Общий перелив</strong><div class="big-value ${totalOverflow === 0 ? "good" : "warning"}">${totalOverflow > 0 ? "+" + totalOverflow + "%" : "0%"}</div></div>`;
+    html += `<div class="summary-card"><strong>Обычные проки</strong><strong>${normalTotal} / ${normalTotal}</strong></div>`;
+    html += `<div class="summary-card"><strong>Проки приглашённой звезды</strong><strong>${starTotal} / ${starTotal}</strong></div>`;
+    html += `<div class="summary-card"><strong>Всего проков</strong><strong>${grandTotal} / ${grandTotal}</strong></div>`;
+    html += `</div><p class="small">Перезарядка имеет базовое значение −15%. Обычный прок уменьшает её ещё на 3%. Прок приглашённой звезды уменьшает её ещё на 2%. Итоговая характеристика ограничена значением −50%.</p>`;
+
+    resultContent.innerHTML = html;
+
+}
+
+/* =========================================================
+   ИСПОЛЬЗОВАНИЕ
+   ========================================================= */
+
+function updateUsage() {
+
+    const stats = getEnabledStats();
+    const procs = getProcs();
+    const invitedStarProcs = getInvitedStarProcs();
+    const normalTotal = Array.from({length: 5}, (_, i) => getSlotTotalProcs(i)).reduce((a, b) => a + b, 0);
+    const usedNormal = procs.reduce((total, slot) => total + slot[0] + slot[1] + slot[2], 0);
+    const invitedStarTotal = invitedStarProcs.reduce((total, value) => total + value, 0);
+    const invitedStarZeros = invitedStarProcs.filter(value => value === 0).length;
+    const starMax = getInvitedStarTotalProcs();
+    const grandTotal = normalTotal + starMax;
+
+    const beamLimit = BEAM_LIMITS[Math.min(8, Math.max(3, stats.length))];
+    const modeText = stats.length <= 4
+        ? "Сначала запускается точный динамический поиск без эвристического отсечения. Для защиты от зависания действует лимит уникальных состояний; при его превышении калькулятор автоматически переключится на приближённый поиск и сообщит об этом."
+        : `Для ${stats.length} характеристик используется быстрый приближённый поиск с ограничением до ${beamLimit.toLocaleString("ru-RU")} состояний. Глобальный оптимум не гарантируется.`;
+
+    usage.innerHTML = `
+        <div class="summary-grid">
+            <div class="summary-card"><strong>Общий проковый пул</strong>${grandTotal}</div>
+            <div class="summary-card"><strong>Обычные проки</strong>${usedNormal} / ${normalTotal}</div>
+            <div class="summary-card"><strong>Приглашённая звезда</strong>${invitedStarTotal} / ${starMax}</div>
+            <div class="summary-card"><strong>Нулевые проки звезды</strong><span class="${invitedStarZeros <= getInvitedStarMaxZeros() ? "good" : "bad"}">${invitedStarZeros} / ${getInvitedStarMaxZeros()}</span></div>
+            <div class="summary-card"><strong>Выбрано характеристик</strong>${stats.length}</div>
+        </div>
+        <div class="search-mode">${modeText}</div>
+        <p class="small">Для каждого обычного слота используется уровень 1–15 (0–14 проков). Приглашённая звезда использует уровень 1–20 (0–19 проков).</p>
+    `;
+
+}
+
+/* =========================================================
+   ОБНОВЛЕНИЕ ЦЕЛЕЙ
+   ========================================================= */
+
+function refreshTargetsPanel() {
+
+    const currentValues = {};
+
+    document
+        .querySelectorAll(
+            ".target-input"
+        )
+        .forEach(
+            input => {
+
+                currentValues[
+                    input.dataset.targetStat
+                ] =
+                    input.value;
+
+            }
+        );
+
+    createTargetsPanel();
+
+    document
+        .querySelectorAll(
+            ".target-input"
+        )
+        .forEach(
+            input => {
+
+                const stat =
+                    input.dataset.targetStat;
+
+                if (
+                    currentValues[stat] !==
+                    undefined
+                ) {
+
+                    input.value =
+                        currentValues[stat];
+
+                }
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   ЗАПУСК
+   ========================================================= */
+
+function startCalculation() {
+
+    validationError.textContent =
+        "";
+
+    result.style.display =
+        "none";
+
+    progress.textContent =
+        "";
+
+    const validation =
+        validate();
+
+    if (
+        !validation.valid
+    ) {
+
+        validationError.textContent =
+            validation.error;
+
+        return;
+
+    }
+
+    const stats =
+        getEnabledStats();
+
+    const procs =
+        getProcs();
+
+    const invitedStarProcs =
+        getInvitedStarProcs();
+
+    const targets =
+        getTargets();
+
+    calculateButton.disabled =
+        true;
+
+    calculateButton.textContent =
+        "Идёт расчёт...";
+
+    const worker =
+        createWorker();
+
+    worker.onmessage =
+        function(event) {
+
+            const data =
+                event.data;
+
+            if (
+                data.type ===
+                "mode"
+            ) {
+
+                if (data.exactAttempt) {
+                    progress.textContent =
+                        "Пробую точный поиск: состояния не отсекаются по рейтингу. Если лимит памяти будет превышен, включится безопасный приближённый поиск.";
+                } else if (data.exactFallback) {
+                    progress.textContent =
+                        "Точный поиск превысил безопасный лимит состояний. Переключаюсь на быстрый приближённый поиск; оптимальность не будет гарантирована.";
+                } else if (data.statsCount <= 4) {
+                    progress.textContent = "Запущен поиск...";
+                } else {
+                    progress.textContent =
+                        `Запущен быстрый поиск для ${data.statsCount} характеристик. Сохраняется до ${data.beamLimit.toLocaleString("ru-RU")} лучших состояний.`;
+                }
+
+                return;
+
+            }
+
+            if (
+                data.type ===
+                "progress"
+            ) {
+
+                const exactLabel = data.exact ? "Точный поиск — " : "";
+                if (data.slot === "★") {
+                    progress.textContent =
+                        `${exactLabel}обработана приглашённая звезда. Состояний: ${data.states.toLocaleString("ru-RU")}`;
+                } else {
+                    progress.textContent =
+                        `${exactLabel}обработан слот ${data.slot}/5. Состояний: ${data.states.toLocaleString("ru-RU")}`;
+                }
+
+                return;
+
+            }
+
+            if (
+                data.type ===
+                "error"
+            ) {
+
+                progress.textContent =
+                    "Ошибка расчёта: " +
+                    data.error;
+
+                calculateButton.disabled =
+                    false;
+
+                calculateButton.textContent =
+                    "Рассчитать оптимальную комбинацию";
+
+                if (
+                    worker.__blobUrl
+                ) {
+
+                    URL.revokeObjectURL(
+                        worker.__blobUrl
+                    );
+
+                }
+
+                worker.terminate();
+
+                return;
+
+            }
+
+            if (
+                data.type ===
+                "done"
+            ) {
+
+                calculateButton.disabled =
+                    false;
+
+                calculateButton.textContent =
+                    "Рассчитать оптимальную комбинацию";
+
+                if (
+                    worker.__blobUrl
+                ) {
+
+                    URL.revokeObjectURL(
+                        worker.__blobUrl
+                    );
+
+                }
+
+                worker.terminate();
+
+                if (
+                    !data.result
+                ) {
+
+                    progress.textContent =
+                        "Не удалось построить комбинацию.";
+
+                    return;
+
+                }
+
+                progress.textContent = data.optimality === "proven"
+                    ? "Расчёт завершён. Глобальный оптимум доказан для заданных целей и ограничений."
+                    : "Расчёт завершён. Найден лучший вариант среди проверенных состояний; глобальный оптимум не доказан.";
+
+                showResult(
+                    data.result,
+                    stats,
+                    targets
+                );
+
+            }
+
+        };
+
+    worker.onerror =
+        function(error) {
+
+            console.error(
+                error
+            );
+
+            progress.textContent =
+                "Произошла ошибка расчёта.";
+
+            calculateButton.disabled =
+                false;
+
+            calculateButton.textContent =
+                "Рассчитать оптимальную комбинацию";
+
+            if (
+                worker.__blobUrl
+            ) {
+
+                URL.revokeObjectURL(
+                    worker.__blobUrl
+                );
+
+            }
+
+            worker.terminate();
+
+        };
+
+    worker.postMessage({
+
+        stats,
+
+        procs,
+
+        invitedStarProcs,
+
+        targets
+
+    });
+
+}
+
+
+/* =========================================================
+   УРОВНИ ПРОКАЧКИ
+   ========================================================= */
+
+procLevelSelects.forEach(select => {
+    select.addEventListener("change", function() {
+        updateLevelLimits();
+        updateProcSums();
+        updateUsage();
+        result.style.display = "none";
+    });
+});
+
+if (invitedStarLevelSelect) {
+    invitedStarLevelSelect.addEventListener("change", function() {
+        updateLevelLimits();
+        updateInvitedStarSum();
+        updateUsage();
+        result.style.display = "none";
+    });
+}
+
+/* =========================================================
+   ОБЫЧНЫЕ ПРОКИ — СОБЫТИЯ
+   ========================================================= */
+
+procCells.forEach(
+    cell => {
+
+        cell.addEventListener(
+            "input",
+            function() {
+
+                if (
+                    cell.value !== ""
+                ) {
+
+                    let value =
+                        Number(
+                            cell.value
+                        );
+
+                    if (
+                        Number.isFinite(value)
+                    ) {
+
+                        value =
+                            Math.floor(
+                                value
+                            );
+
+                        value =
+                            Math.max(
+                                0,
+                                Math.min(
+                                    getSlotTotalProcs(Number(cell.dataset.slot)),
+                                    value
+                                )
+                            );
+
+                        cell.value =
+                            value;
+
+                    }}
+
+                updateProcSums();
+
+                updateUsage();
+
+                result.style.display =
+                    "none";
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   ЗВЕЗДА — СОБЫТИЯ
+   ========================================================= */
+
+invitedStarCells.forEach(
+    cell => {
+
+        cell.addEventListener(
+            "input",
+            function() {
+
+                if (
+                    cell.value !== ""
+                ) {
+
+                    let value =
+                        Number(
+                            cell.value
+                        );
+
+                    if (
+                        Number.isFinite(value)
+                    ) {
+
+                        value =
+                            Math.floor(
+                                value
+                            );
+
+                        value =
+                            Math.max(
+                                0,
+                                Math.min(
+                                    getInvitedStarTotalProcs(),
+                                    value
+                                )
+                            );
+
+                        cell.value =
+                            value;
+
+                    }
+
+                }
+
+                updateInvitedStarSum();
+
+                updateUsage();
+
+                result.style.display =
+                    "none";
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   СТАТЫ — СОБЫТИЯ
+   ========================================================= */
+
+statChecks.forEach(
+    check => {
+
+        check.addEventListener(
+            "change",
+            function() {
+
+                refreshTargetsPanel();
+
+                updateUsage();
+
+                result.style.display =
+                    "none";
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   ЦЕЛИ — СОБЫТИЯ
+   ========================================================= */
+
+/*
+    ИСПРАВЛЕНО.
+
+    Раньше здесь было:
+
+        Number(event.target.value)
+
+    и если пользователь вводил "-",
+    браузер сразу получал NaN.
+
+    Из-за этого минус невозможно было
+    нормально начать вводить.
+
+    Теперь:
+
+        ""   -> разрешено
+        "-"  -> разрешено
+        "-5" -> разрешено
+        "-50" -> разрешено
+
+    А если введено число за пределами
+    диапазона, оно автоматически
+    ограничивается от -50 до 0.
+*/
+
+targetsGrid.addEventListener(
+    "input",
+    function(event) {
+
+        if (
+            !event.target.classList.contains(
+                "target-input"
+            )
+        ) {
+
+            return;
+
+        }
+
+        const input =
+            event.target;
+
+        const stat =
+            input.dataset.targetStat;
+
+        /*
+            Только для перезарядок.
+        */
+
+        if (
+            COOLDOWN_STATS.includes(
+                stat
+            )
+        ) {
+
+            const raw =
+                input.value.trim();
+
+            /*
+                Важнейшая часть:
+
+                пока пользователь вводит
+                "-" — ничего не меняем.
+
+                Иначе "-" превращался бы
+                обратно в 0.
+            */
+
+            if (
+                raw === "" ||
+                raw === "-"
+            ) {
+
+                result.style.display =
+                    "none";
+
+                return;
+
+            }
+
+            /*
+                Проверяем число.
+            */
+
+            const value =
+                Number(
+                    raw
+                );
+
+            if (
+                Number.isFinite(value)
+            ) {
+
+                const clamped =
+                    Math.max(
+                        -50,
+                        Math.min(
+                            0,
+                            Math.floor(
+                                value
+                            )
+                        )
+                    );/*
+                    Перезаписываем только если
+                    число действительно вышло
+                    за допустимый диапазон.
+
+                    Например:
+
+                    -25 -> остаётся -25
+                    -50 -> остаётся -50
+                    -70 -> превращается в -50
+                    10  -> превращается в 0
+                */
+
+                if (
+                    value !== clamped
+                ) {
+
+                    input.value =
+                        clamped;
+
+                }
+
+            }
+
+        }
+
+        result.style.display =
+            "none";
+
+    }
+);
+
+
+/* =========================================================
+   КНОПКА
+   ========================================================= */
+
+calculateButton.addEventListener(
+    "click",
+    startCalculation
+);
+
+
+/* =========================================================
+   ПЕРВОНАЧАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ
+   ========================================================= */
+
+createTargetsPanel();
+
+updateLevelLimits();
+updateProcSums();
+
+updateInvitedStarSum();
+
+updateUsage();
+
+</script>
+
+</body>
+
+</html>
